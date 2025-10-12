@@ -1,2 +1,29 @@
-<h1 class="text-3xl font-bold underline">{{ title() }}</h1>
+<header>
+  <nav class="pt-2 px-4 bg-white flex flex-wrap items-end *:mx-auto shadow-sm">
+    <h1 class="text-4xl font-bold leading-snug text-red-700 text-center">{{ title() }}</h1>
+    <div class="flex">
+      @let size = 45;
+      <img [width]="size" [height]="size" ngSrc="/odlaw.jpg" alt="An illustration of Odlaw." />
+      <img [width]="size" [height]="size" ngSrc="/waldo.jpg" alt="An illustration of Waldo." />
+      <img [width]="size" [height]="size" ngSrc="/wilma.jpg" alt="An illustration of Wilma." />
+      <img
+        [width]="size"
+        [height]="size"
+        ngSrc="/wizard.jpg"
+        alt="An illustration of Wizard Whitebeard."
+      />
+    </div>
+  </nav>
+</header>
+<main>
+  <div class="absolute top-16 max-sm:top-24 left-0 right-0 bottom-0 -z-10 overflow-hidden">
+    <img
+      fill
+      priority
+      ngSrc="/where-is-waldo-winter.jpg"
+      class="object-contain object-center"
+      alt="A crowded illustration shows Waldo and his friends skiing on an icy mountain."
+    />
+  </div>
+</main>
 <router-outlet />
