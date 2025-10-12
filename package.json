@@ -1,0 +1,61 @@
+{
+  "description": "A web-based `Where's Waldo` game built as a solution for The Odin Project assignment.",
+  "name": "odin-where-is-waldo",
+  "version": "0.0.0",
+  "scripts": {
+    "watch": "ng build --watch --configuration development",
+    "type-check": "tsc --noEmit -p ./tsconfig.spec.json",
+    "lint": "ng lint --silent",
+    "start": "ng serve",
+    "build": "ng build",
+    "test": "ng test",
+    "ng": "ng"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true,
+    "overrides": [
+      {
+        "files": "*.html",
+        "options": {
+          "parser": "angular"
+        }
+      }
+    ]
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/common": "^20.3.0",
+    "@angular/compiler": "^20.3.0",
+    "@angular/core": "^20.3.0",
+    "@angular/forms": "^20.3.0",
+    "@angular/platform-browser": "^20.3.0",
+    "@angular/router": "^20.3.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^20.3.5",
+    "@angular/cli": "^20.3.5",
+    "@angular/compiler-cli": "^20.3.0",
+    "@tailwindcss/postcss": "^4.1.14",
+    "@testing-library/angular": "^18.1.0",
+    "@testing-library/dom": "^10.0.0",
+    "@testing-library/jest-dom": "^6.4.8",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/jasmine": "^5.1.9",
+    "angular-eslint": "20.4.0",
+    "eslint": "^9.37.0",
+    "jasmine-core": "^5.12.0",
+    "jsdom": "^27.0.0",
+    "postcss": "^8.5.6",
+    "simple-git-hooks": "^2.13.1",
+    "tailwindcss": "^4.1.14",
+    "typescript": "~5.9.2",
+    "typescript-eslint": "8.46.0",
+    "vitest": "^3.2.4"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npm run lint && npm run type-check"
+  }
+}
