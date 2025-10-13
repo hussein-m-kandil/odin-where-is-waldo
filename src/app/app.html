@@ -20,11 +20,13 @@
     <div class="pt-[63.3984%]">
       <!-- Fill the parent's height relative to its width (old school `aspect-ratio`) -->
     </div>
+    <!-- eslint-disable-next-line @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
     <img
       fill
       priority
       ngSrc="/where-is-waldo-winter.jpg"
       alt="A crowded illustration shows Waldo and his friends skiing on an icy mountain."
+      (click)="selectCharacter($event)"
     />
   </div>
 </main>
