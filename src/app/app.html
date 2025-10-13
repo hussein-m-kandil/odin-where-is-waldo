@@ -16,17 +16,27 @@
   </nav>
 </header>
 <main>
-  <div class="relative w-full max-w-[100vh] mx-auto mt-[10vh] overflow-hidden">
+  <!-- eslint-disable-next-line @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
+  <div
+    class="relative w-full max-w-[100vh] mx-auto mt-[10vh] overflow-hidden"
+    (click)="selectCharacter($event)"
+  >
     <div class="pt-[63.3984%]">
       <!-- Fill the parent's height relative to its width (old school `aspect-ratio`) -->
     </div>
-    <!-- eslint-disable-next-line @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
+    @if (selectedPoint(); as currentSelectedPoint) {
+    <div
+      aria-label="Selection marker"
+      class="absolute z-10 border-3 border-black"
+      [style]="createMarkerStyle(currentSelectedPoint.relative)"
+    ></div>
+    }
     <img
       fill
+      #crowd
       priority
       ngSrc="/where-is-waldo-winter.jpg"
       alt="A crowded illustration shows Waldo and his friends skiing on an icy mountain."
-      (click)="selectCharacter($event)"
     />
   </div>
 </main>
