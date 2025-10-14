@@ -6,9 +6,16 @@ import {
   ElementRef,
   afterNextRender,
 } from '@angular/core';
+import { Placement, Point, SelectedPoint } from '../types';
 import { NgOptimizedImage } from '@angular/common';
-import { Point, SelectedPoint } from '../types';
 import { RouterOutlet } from '@angular/router';
+
+const CHARACTERS = [
+  { src: '/odlaw.jpg', alt: 'An illustration of Odlaw.' },
+  { src: '/waldo.jpg', alt: 'An illustration of Waldo.' },
+  { src: '/wilma.jpg', alt: 'An illustration of Wilma.' },
+  { src: '/wizard.jpg', alt: 'An illustration of Wizard Whitebeard.' },
+];
 
 @Component({
   selector: 'app-root',
@@ -17,8 +24,9 @@ import { RouterOutlet } from '@angular/router';
   styleUrl: './app.css',
 })
 export class App implements OnDestroy {
-  private readonly crowdedImage = viewChild.required<ElementRef<HTMLImageElement>>('crowd');
+  protected readonly characters = CHARACTERS;
   protected readonly selectedPoint = signal<SelectedPoint | null>(null);
+  private readonly crowdedImage = viewChild.required<ElementRef<HTMLImageElement>>('crowd');
   private readonly removeSelection = () => this.selectedPoint.set(null);
 
   constructor() {
@@ -36,17 +44,36 @@ export class App implements OnDestroy {
     window.removeEventListener('click', this.removeSelection, true);
   }
 
-  protected createMarkerStyle(relativePoint: Point) {
-    const { clientWidth, clientHeight } = this.crowdedImage().nativeElement;
+  protected generatePlacementStyle(placement: Placement): Record<string, string> {
+    return Object.fromEntries(Object.entries(placement).map(([prop, num]) => [prop, `${num}px`]));
+  }
+
+  protected calcSelectionMarkerPlacement(relativePoint: Point): Placement {
+    const imgRect = this.crowdedImage().nativeElement.getBoundingClientRect();
     const markerDiameter = 20;
     const markerRadius = markerDiameter / 2;
-    const maxX = clientWidth - markerDiameter;
-    const maxY = clientHeight - markerDiameter;
+    const maxX = imgRect.right - markerDiameter;
+    const maxY = imgRect.bottom - markerDiameter;
+    const minX = imgRect.left;
+    const minY = imgRect.top;
     return {
-      left: `${Math.min(Math.max(relativePoint.x - markerRadius, 0), maxX)}px`,
-      top: `${Math.min(Math.max(relativePoint.y - markerRadius, 0), maxY)}px`,
-      height: `${markerDiameter}px`,
-      width: `${markerDiameter}px`,
+      left: Math.min(Math.max(relativePoint.x - markerRadius, minX), maxX),
+      top: Math.min(Math.max(relativePoint.y - markerRadius, minY), maxY),
+      height: markerDiameter,
+      width: markerDiameter,
+    };
+  }
+
+  protected calcSelectionMenuPlacement(markerPlacement: Placement): Placement {
+    const menuMargin = 8;
+    const menuDiameter = 100;
+    const menuRadius = menuDiameter / 2;
+    const markerCenterX = markerPlacement.width / 2 + markerPlacement.left;
+    return {
+      top: Math.max(markerPlacement.top - (menuDiameter + menuMargin), 0),
+      left: Math.max(markerCenterX - menuRadius, 0),
+      height: menuDiameter,
+      width: menuDiameter,
     };
   }
 

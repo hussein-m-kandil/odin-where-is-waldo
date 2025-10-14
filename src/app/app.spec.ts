@@ -29,23 +29,29 @@ describe('App', () => {
     expect(screen.getByRole('img', { name: /crowded .* waldo/i })).toBeVisible();
   });
 
-  it('should not render selection marker marker on start', async () => {
+  it('should not render character selector on start', async () => {
     await renderApp();
-    expect(screen.queryByLabelText(/marker/i)).toBeNull();
+    expect(screen.queryByLabelText(/selector menu/i)).toBeNull();
+    expect(screen.queryByLabelText(/selector marker/i)).toBeNull();
+    expect(screen.queryByLabelText(/character selector$/i)).toBeNull();
   });
 
-  it('should render selection marker marker after clicking the main image', async () => {
+  it('should render character selector after clicking the main image', async () => {
     const user = userEvent.setup();
     await renderApp();
     await user.click(screen.getByRole('img', { name: /crowded .* waldo/i }));
-    expect(screen.getByLabelText(/marker/i)).toBeVisible();
+    expect(screen.getByLabelText(/selector menu/i)).toBeVisible();
+    expect(screen.getByLabelText(/selector marker/i)).toBeVisible();
+    expect(screen.getByLabelText(/character selector$/i)).toBeVisible();
   });
 
-  it('should remove selection marker marker after clicking outside main image', async () => {
+  it('should remove character selector after clicking outside main image', async () => {
     const user = userEvent.setup();
     const { container } = await renderApp();
     await user.click(screen.getByRole('img', { name: /crowded .* waldo/i }));
     await user.click(container);
-    expect(screen.queryByLabelText(/marker/i)).toBeNull();
+    expect(screen.queryByLabelText(/selector menu/i)).toBeNull();
+    expect(screen.queryByLabelText(/selector marker/i)).toBeNull();
+    expect(screen.queryByLabelText(/character selector$/i)).toBeNull();
   });
 });

@@ -8,3 +8,10 @@ export interface SelectedPoint {
   absolute: Point;
   natural: Point;
 }
+
+export interface Placement {
+  height: number;
+  width: number;
+  left: number;
+  top: number;
+}
