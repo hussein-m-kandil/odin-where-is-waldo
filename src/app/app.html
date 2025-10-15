@@ -29,7 +29,10 @@
       ngSrc="/where-is-waldo-winter.jpg"
       alt="A crowded illustration shows Waldo and his friends skiing on an icy mountain."
     />
-    <app-character-selector [characters]="characters.data" [selectedPoint]="selectedPoint()" />
+    <app-character-selector
+      [characters]="characters.data"
+      [selectedPoint]="characterSelection.selectedPoint"
+    />
   </div>
 </main>
 <router-outlet />

@@ -1,5 +1,4 @@
 import {
-  signal,
   inject,
   Component,
   OnDestroy,
@@ -7,11 +6,11 @@ import {
   ElementRef,
   afterNextRender,
 } from '@angular/core';
+import { CharacterSelection } from './characters/character-selection/character-selection';
 import { CharacterSelector } from './character-selector/character-selector';
 import { Characters } from './characters/characters';
 import { NgOptimizedImage } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { SelectedPoint } from '../types';
 
 @Component({
   selector: 'app-root',
@@ -20,10 +19,11 @@ import { SelectedPoint } from '../types';
   styleUrl: './app.css',
 })
 export class App implements OnDestroy {
-  protected readonly characters = inject(Characters);
   protected readonly crowdedImage = viewChild.required<ElementRef<HTMLImageElement>>('crowd');
-  protected readonly selectedPoint = signal<SelectedPoint | null>(null);
-  private readonly removeSelection = () => this.selectedPoint.set(null);
+  protected readonly characterSelection = inject(CharacterSelection);
+  protected readonly characters = inject(Characters);
+
+  private readonly _removeCharacterSelection = () => this.characterSelection.deselect();
 
   constructor() {
     afterNextRender({
@@ -31,28 +31,18 @@ export class App implements OnDestroy {
         // Remove the selection on window-click in the capture phase (before other handlers),
         // if the click occurs on the crowded image, the selection will be made again,
         // otherwise it remains removed
-        window.addEventListener('click', this.removeSelection, true);
+        window.addEventListener('click', this._removeCharacterSelection, true);
       },
     });
   }
 
   ngOnDestroy(): void {
-    window.removeEventListener('click', this.removeSelection, true);
+    window.removeEventListener('click', this._removeCharacterSelection, true);
   }
 
   protected selectCharacter(e: MouseEvent) {
-    const img = this.crowdedImage().nativeElement;
-    const imgRect = img.getBoundingClientRect();
-    const scaleFactor = img.naturalWidth / img.clientWidth;
-    const absolute = { x: Math.trunc(e.clientX), y: Math.trunc(e.clientY) };
-    const relative = {
-      x: Math.trunc(absolute.x - imgRect.left),
-      y: Math.trunc(absolute.y - imgRect.top),
-    };
-    const natural = {
-      x: Math.trunc(relative.x * scaleFactor),
-      y: Math.trunc(relative.y * scaleFactor),
-    };
-    this.selectedPoint.set({ absolute, relative, natural });
+    const point = { x: Math.trunc(e.clientX), y: Math.trunc(e.clientY) };
+    const imageElement = this.crowdedImage().nativeElement;
+    this.characterSelection.select(imageElement, point);
   }
 }
