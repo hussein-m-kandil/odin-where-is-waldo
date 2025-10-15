@@ -16,36 +16,11 @@
   </nav>
 </header>
 <main>
-  @if (selectedPoint(); as currentSelectedPoint) {
-  <!-- prettier-ignore -->
-  @let markerPlacement = calcSelectionMarkerPlacement(currentSelectedPoint.absolute);
-  @let menuPlacement = calcSelectionMenuPlacement(markerPlacement);
-  <div aria-label="Character selector" class="*:absolute *:z-10 *:border-black">
-    <div
-      aria-label="Character selector marker"
-      class="border-3 bg-transparent"
-      [style]="generatePlacementStyle(markerPlacement)"
-    ></div>
-    <div
-      aria-label="Character selector menu"
-      class="border-2 bg-white"
-      [style]="generatePlacementStyle(menuPlacement)"
-    >
-      @for (c of characters; track c.src) {
-      <!-- prettier-ignore -->
-      <div 
-        [class]="`absolute border-1 w-1/2 h-1/2`"
-        [style]="`
-        top: ${$index < ($count / 2) ? 0 : 50}%; 
-        left: ${$even ? 0 : 50 }%;
-        `"
-      >
-        <img fill [ngSrc]="c.src" [alt]="c.alt" />
-      </div>
-      }
-    </div>
-  </div>
-  }
+  <app-character-selector
+    [characters]="characters"
+    [selectedPoint]="selectedPoint()"
+    [containerElementRef]="crowdedImage()"
+  />
   <div class="relative w-full max-w-[100vh] mx-auto mt-[10vh] overflow-hidden">
     <div class="pt-[63.3984%]">
       <!-- Fill the parent's height relative to its width (old school `aspect-ratio`) -->
