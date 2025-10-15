@@ -2,16 +2,11 @@
   <nav class="pt-2 px-4 bg-white flex flex-wrap gap-2 *:mx-auto shadow-sm">
     <h1 class="text-4xl font-extrabold text-center text-red-700">Where's Waldo?</h1>
     <div class="self-end flex">
+      @for (c of characters.data; track c.src) {
+      <!-- prettier-ignore -->
       @let size = 45;
-      <img [width]="size" [height]="size" ngSrc="/odlaw.jpg" alt="An illustration of Odlaw." />
-      <img [width]="size" [height]="size" ngSrc="/waldo.jpg" alt="An illustration of Waldo." />
-      <img [width]="size" [height]="size" ngSrc="/wilma.jpg" alt="An illustration of Wilma." />
-      <img
-        [width]="size"
-        [height]="size"
-        ngSrc="/wizard.jpg"
-        alt="An illustration of Wizard Whitebeard."
-      />
+      <img [width]="size" [height]="size" [ngSrc]="c.src" [alt]="c.alt" />
+      }
     </div>
   </nav>
 </header>
@@ -29,10 +24,7 @@
       ngSrc="/where-is-waldo-winter.jpg"
       alt="A crowded illustration shows Waldo and his friends skiing on an icy mountain."
     />
-    <app-character-selector
-      [characters]="characters.data"
-      [selectedPoint]="characterSelection.selectedPoint"
-    />
   </div>
+  <app-character-menu />
 </main>
 <router-outlet />

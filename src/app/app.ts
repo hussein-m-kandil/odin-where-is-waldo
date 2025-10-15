@@ -6,20 +6,21 @@ import {
   ElementRef,
   afterNextRender,
 } from '@angular/core';
+import { CharacterMenu } from './characters/character-selection/character-menu/character-menu';
 import { CharacterSelection } from './characters/character-selection/character-selection';
-import { CharacterSelector } from './character-selector/character-selector';
 import { Characters } from './characters/characters';
 import { NgOptimizedImage } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, NgOptimizedImage, CharacterSelector],
+  imports: [RouterOutlet, NgOptimizedImage, CharacterMenu],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
 export class App implements OnDestroy {
-  protected readonly crowdedImage = viewChild.required<ElementRef<HTMLImageElement>>('crowd');
+  private readonly _crowdedImage = viewChild.required<ElementRef<HTMLImageElement>>('crowd');
+
   protected readonly characterSelection = inject(CharacterSelection);
   protected readonly characters = inject(Characters);
 
@@ -42,7 +43,7 @@ export class App implements OnDestroy {
 
   protected selectCharacter(e: MouseEvent) {
     const point = { x: Math.trunc(e.clientX), y: Math.trunc(e.clientY) };
-    const imageElement = this.crowdedImage().nativeElement;
+    const imageElement = this._crowdedImage().nativeElement;
     this.characterSelection.select(imageElement, point);
   }
 }
