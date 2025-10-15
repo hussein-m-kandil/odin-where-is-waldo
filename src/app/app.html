@@ -16,11 +16,6 @@
   </nav>
 </header>
 <main>
-  <app-character-selector
-    [characters]="characters"
-    [selectedPoint]="selectedPoint()"
-    [containerElementRef]="crowdedImage()"
-  />
   <div class="relative w-full max-w-[100vh] mx-auto mt-[10vh] overflow-hidden">
     <div class="pt-[63.3984%]">
       <!-- Fill the parent's height relative to its width (old school `aspect-ratio`) -->
@@ -34,6 +29,7 @@
       ngSrc="/where-is-waldo-winter.jpg"
       alt="A crowded illustration shows Waldo and his friends skiing on an icy mountain."
     />
+    <app-character-selector [characters]="characters.data" [selectedPoint]="selectedPoint()" />
   </div>
 </main>
 <router-outlet />

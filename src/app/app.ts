@@ -1,5 +1,6 @@
 import {
   signal,
+  inject,
   Component,
   OnDestroy,
   viewChild,
@@ -7,16 +8,10 @@ import {
   afterNextRender,
 } from '@angular/core';
 import { CharacterSelector } from './character-selector/character-selector';
+import { Characters } from './characters/characters';
 import { NgOptimizedImage } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { SelectedPoint } from '../types';
-
-const CHARACTERS = [
-  { src: '/odlaw.jpg', alt: 'An illustration of Odlaw.' },
-  { src: '/waldo.jpg', alt: 'An illustration of Waldo.' },
-  { src: '/wilma.jpg', alt: 'An illustration of Wilma.' },
-  { src: '/wizard.jpg', alt: 'An illustration of Wizard Whitebeard.' },
-];
 
 @Component({
   selector: 'app-root',
@@ -25,7 +20,7 @@ const CHARACTERS = [
   styleUrl: './app.css',
 })
 export class App implements OnDestroy {
-  protected readonly characters = CHARACTERS;
+  protected readonly characters = inject(Characters);
   protected readonly crowdedImage = viewChild.required<ElementRef<HTMLImageElement>>('crowd');
   protected readonly selectedPoint = signal<SelectedPoint | null>(null);
   private readonly removeSelection = () => this.selectedPoint.set(null);
