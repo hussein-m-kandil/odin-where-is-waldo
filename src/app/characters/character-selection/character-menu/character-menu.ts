@@ -1,8 +1,8 @@
+import { Placement, Point } from '../character-selection.types';
 import { CharacterSelection } from '../character-selection';
-import { Characters } from '../../../characters/characters';
-import { Placement, Point } from '../../../../types';
 import { NgOptimizedImage } from '@angular/common';
 import { Component, inject } from '@angular/core';
+import { Characters } from '../../characters';
 
 @Component({
   selector: 'app-character-menu',

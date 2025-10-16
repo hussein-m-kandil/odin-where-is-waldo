@@ -1,4 +1,4 @@
-import { Point, SelectedPoint } from '../../../types';
+import { Point, SelectedPoint } from './character-selection.types';
 import { signal, Injectable } from '@angular/core';
 
 @Injectable({
