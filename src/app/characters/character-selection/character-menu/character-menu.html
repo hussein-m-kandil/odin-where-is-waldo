@@ -2,27 +2,28 @@
 <!-- prettier-ignore -->
 @let markerPlacement = calcSelectorMarkerPlacement(currentSelectedPoint.absolute);
 @let menuPlacement = calcSelectorMenuPlacement(markerPlacement);
-<div
-  [style]="generatePlacementStyle(markerPlacement)"
-  aria-label="Character selector marker"
-  class="absolute z-10 border-black border-3 bg-transparent"
-></div>
-<div
-  aria-label="Character selector menu"
-  class="absolute z-10 border-black border-2 bg-white"
-  [style]="generatePlacementStyle(menuPlacement)"
->
-  @for (c of characters.data; track c.src) {
-  <!-- prettier-ignore -->
-  <div 
-      [class]="`absolute border-1 w-1/2 h-1/2`"
+<div class="*:absolute *:z-30 *:border-black">
+  <div
+    class="border-3 bg-transparent"
+    aria-label="Character selector marker"
+    [style]="generatePlacementStyle(markerPlacement)"
+  ></div>
+  <div
+    class="border-2 bg-white"
+    aria-label="Character selector menu"
+    [style]="generatePlacementStyle(menuPlacement)"
+  >
+    @for (c of characters.data; track c.src) {
+    <div
+      class="absolute border-1 w-1/2 h-1/2 text-xs wrap-anywhere"
       [style]="`
-      top: ${$index < ($count / 2) ? 0 : 50}%; 
-      left: ${$even ? 0 : 50 }%;
-      `"
+        top: ${$index < ($count / 2) ? 0 : 50}%;
+        left: ${$even ? 0 : 50 }%;
+        `"
     >
       <img fill [ngSrc]="c.src" [alt]="c.alt" />
     </div>
-  }
+    }
+  </div>
 </div>
 }
