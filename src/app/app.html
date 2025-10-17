@@ -25,6 +25,11 @@
       alt="A crowded illustration shows Waldo and his friends skiing on an icy mountain."
     />
   </div>
-  <app-character-menu />
+  @if (characterSelection.selectedPoint && characterSelection.imageElement) {
+  <app-character-menu
+    [imageElement]="characterSelection.imageElement"
+    [selectedPoint]="characterSelection.selectedPoint"
+  />
+  }
 </main>
 <router-outlet />

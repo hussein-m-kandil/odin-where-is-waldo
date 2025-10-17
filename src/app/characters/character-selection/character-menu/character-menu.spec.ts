@@ -1,12 +1,13 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { CharacterSelection } from '../character-selection';
 import { render, screen } from '@testing-library/angular';
 import { CharacterMenu } from './character-menu';
 import { appConfig } from '../../../app.config';
 
 const rect = new DOMRect(...Object.values({ x: 10, y: 10, w: 1600, h: 900 }));
 const mockImageRect = vi.fn(() => rect);
+
 const mockPoint = vi.fn(() => ({ x: 0, y: 0 }));
+
 const mockImage = vi.fn(() => {
   const image = new Image(160, 90);
   image.getBoundingClientRect = mockImageRect;
@@ -20,20 +21,12 @@ const spacing = 8;
 const menuSize = 90;
 const markerSize = 16;
 
-const mockCharacterSelection = vi.fn<() => Partial<InstanceType<typeof CharacterSelection>>>(() => {
-  return {
-    selectedPoint: { absolute: mockPoint(), relative: mockPoint(), natural: mockPoint() },
-    imageElement: mockImage(),
-  };
-});
-
 const renderComponent = async () => {
+  const selectedPoint = { absolute: mockPoint(), relative: mockPoint(), natural: mockPoint() };
+  const imageElement = mockImage();
   return await render(CharacterMenu, {
-    providers: [
-      ...appConfig.providers,
-      { provide: CharacterSelection, useValue: mockCharacterSelection() },
-    ],
-    inputs: { markerSize, menuSize, spacing },
+    providers: appConfig.providers,
+    inputs: { markerSize, menuSize, spacing, imageElement, selectedPoint },
   });
 };
 
@@ -43,13 +36,7 @@ const menuRegex = /menu/i;
 describe('CharacterMenu', () => {
   afterEach(vi.clearAllMocks);
 
-  it('should not be rendered if there is no a selected point', async () => {
-    mockCharacterSelection.mockImplementationOnce(() => ({ selectedPoint: null }));
-    const { container } = await renderComponent();
-    expect(container).toBeEmptyDOMElement();
-  });
-
-  it('should be rendered if there is a selected point', async () => {
+  it('should be rendered', async () => {
     await renderComponent();
     expect(screen.getByLabelText(menuRegex)).toBeVisible();
     expect(screen.getByLabelText(markerRegex)).toBeVisible();

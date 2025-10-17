@@ -1,18 +1,11 @@
-@if (characterSelection.selectedPoint; as currentSelectedPoint) {
-<!-- prettier-ignore -->
-@let markerPlacement = calcSelectorMarkerPlacement(currentSelectedPoint.absolute);
-@let menuPlacement = calcSelectorMenuPlacement(markerPlacement);
+@let placementStyle = computedPlacementStyle();
 <div class="*:absolute *:z-30 *:border-black">
   <div
     class="border-3 bg-transparent"
     aria-label="Character selector marker"
-    [style]="generatePlacementStyle(markerPlacement)"
+    [style]="placementStyle.marker"
   ></div>
-  <div
-    class="border-2 bg-white"
-    aria-label="Character selector menu"
-    [style]="generatePlacementStyle(menuPlacement)"
-  >
+  <div class="border-2 bg-white" aria-label="Character selector menu" [style]="placementStyle.menu">
     @for (c of characters.data; track c.src) {
     <div
       class="absolute border-1 w-1/2 h-1/2 text-xs wrap-anywhere"
@@ -26,4 +19,3 @@
     }
   </div>
 </div>
-}
