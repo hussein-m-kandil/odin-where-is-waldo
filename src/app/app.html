@@ -11,19 +11,28 @@
   </nav>
 </header>
 <main>
-  <div class="relative w-full max-w-[100vh] mx-auto mt-[10vh] overflow-hidden">
+  <div
+    class="relative w-full max-w-[100vh] mx-auto mt-[10vh] overflow-hidden focus-within:outline-2"
+  >
     <div class="pt-[63.3984%]">
       <!-- Fill the parent's height relative to its width (old school `aspect-ratio`) -->
     </div>
-    <!-- eslint-disable-next-line @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
-    <img
-      fill
-      #crowd
-      priority
+    <button
+      type="button"
+      aria-label="Select a character"
       (click)="selectCharacter($event)"
-      ngSrc="/where-is-waldo-winter.jpg"
-      alt="A crowded illustration shows Waldo and his friends skiing on an icy mountain."
-    />
+      (blur)="removeCharacterSelection()"
+      (keydown.escape)="removeCharacterSelection()"
+      class="absolute top-0 left-0 right-0 bottom-0"
+    >
+      <img
+        fill
+        #crowd
+        priority
+        ngSrc="/where-is-waldo-winter.jpg"
+        alt="A crowded illustration shows Waldo and his friends skiing on an icy mountain."
+      />
+    </button>
   </div>
   @if (characterSelection.selectedPoint && characterSelection.imageElement) {
   <app-character-menu

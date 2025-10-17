@@ -24,7 +24,9 @@ export class App implements OnDestroy {
   protected readonly characterSelection = inject(CharacterSelection);
   protected readonly characters = inject(Characters);
 
-  private readonly _removeCharacterSelection = () => this.characterSelection.deselect();
+  protected readonly removeCharacterSelection = () => {
+    this.characterSelection.deselect();
+  };
 
   constructor() {
     afterNextRender({
@@ -32,13 +34,14 @@ export class App implements OnDestroy {
         // Remove the selection on window-click in the capture phase (before other handlers),
         // if the click occurs on the crowded image, the selection will be made again,
         // otherwise it remains removed
-        window.addEventListener('click', this._removeCharacterSelection, true);
+        window.addEventListener('click', this.removeCharacterSelection, true);
+        // window.addEventListener('keydown', ())
       },
     });
   }
 
   ngOnDestroy(): void {
-    window.removeEventListener('click', this._removeCharacterSelection, true);
+    window.removeEventListener('click', this.removeCharacterSelection, true);
   }
 
   protected selectCharacter(e: MouseEvent) {

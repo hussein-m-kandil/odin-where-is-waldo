@@ -17,6 +17,14 @@ export class CharacterSelection {
     return currentSelectedPoint ? JSON.parse(JSON.stringify(currentSelectedPoint)) : null;
   }
 
+  private _setSelectionState(
+    imageElement: typeof this._imageElement,
+    selectedPoint: ReturnType<typeof this._selectedPoint>
+  ) {
+    this._selectedPoint.set(selectedPoint);
+    this._imageElement = imageElement;
+  }
+
   select(imageElement: HTMLImageElement, absolutePoint: Point) {
     const scaleFactor = imageElement.naturalWidth / imageElement.clientWidth;
     const imgRect = imageElement.getBoundingClientRect();
@@ -28,11 +36,10 @@ export class CharacterSelection {
       x: Math.trunc(relative.x * scaleFactor),
       y: Math.trunc(relative.y * scaleFactor),
     };
-    this._selectedPoint.set({ absolute: absolutePoint, relative, natural });
-    this._imageElement = imageElement;
+    this._setSelectionState(imageElement, { absolute: absolutePoint, relative, natural });
   }
 
   deselect() {
-    this._selectedPoint.set(null);
+    this._setSelectionState(null, null);
   }
 }
