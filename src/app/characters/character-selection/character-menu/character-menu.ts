@@ -1,7 +1,8 @@
 import { Placement, Point, SelectedPoint } from '../character-selection.types';
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
 import { Characters } from '../../characters';
+import { Character } from '../../characters.types';
 
 @Component({
   selector: 'app-character-menu',
@@ -10,13 +11,14 @@ import { Characters } from '../../characters';
   styleUrl: './character-menu.css',
 })
 export class CharacterMenu {
-  readonly imageElement = input.required<HTMLImageElement>();
-  readonly selectedPoint = input.required<SelectedPoint>();
   readonly characters = inject(Characters);
+
+  readonly imageElement = input.required<HTMLImageElement>();
   readonly markerSize = input(20);
   readonly menuSize = input(100);
   readonly spacing = input(8);
 
+  readonly selectedPoint = input.required<SelectedPoint>();
   protected readonly computedPlacementStyle = computed(() => {
     const markerPlacement = this.calcSelectorMarkerPlacement(this.selectedPoint().absolute);
     const menuPlacement = this.calcSelectorMenuPlacement(markerPlacement);
@@ -25,6 +27,12 @@ export class CharacterMenu {
       menu: this.generatePlacementStyle(menuPlacement),
     };
   });
+
+  readonly characterSelected = output<Character['name']>();
+
+  protected selectCharacter(name: Character['name']) {
+    this.characterSelected.emit(name);
+  }
 
   protected generatePlacementStyle(placement: Placement): Record<string, string> {
     return Object.fromEntries(Object.entries(placement).map(([prop, num]) => [prop, `${num}px`]));

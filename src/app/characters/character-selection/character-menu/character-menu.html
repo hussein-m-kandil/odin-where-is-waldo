@@ -6,7 +6,7 @@
     [style]="placementStyle.marker"
   ></div>
   <div class="border-2 bg-white" aria-label="Character selector menu" [style]="placementStyle.menu">
-    @for (c of characters.data; track c.name) {
+    @for (character of characters.data; track character.name) {
     <div
       class="absolute border-1 w-1/2 h-1/2 text-xs wrap-anywhere"
       [style]="`
@@ -14,7 +14,14 @@
         left: ${$even ? 0 : 50 }%;
         `"
     >
-      <img fill [ngSrc]="c.image.src" [alt]="c.image.alt" />
+      <button
+        type="button"
+        [aria-label]="`Select ${character.name}`"
+        (click)="selectCharacter(character.name)"
+        class="absolute top-0 left-0 right-0 bottom-0"
+      >
+        <img fill [ngSrc]="character.image.src" [alt]="character.image.alt" />
+      </button>
     </div>
     }
   </div>
