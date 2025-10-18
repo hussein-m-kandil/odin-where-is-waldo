@@ -39,51 +39,59 @@ describe('App', () => {
     expect(screen.getByRole('img', { name: /crowded .* waldo/i })).toBeVisible();
   });
 
-  it('should call `CharacterSelection` `deselect` and `select` methods on click the crowded image', async () => {
+  it('should add character selection when the crowded image is clicked', async () => {
     const user = userEvent.setup();
     await renderComponent();
     await user.click(screen.getByRole('img', { name: /crowded .* waldo/i }));
     expect(characterSelection.select).toHaveBeenCalledOnce();
-    expect(characterSelection.deselect).toHaveBeenCalledOnce();
+    expect(characterSelection.deselect).not.toHaveBeenCalled();
   });
 
-  it('should always call `CharacterSelection` `deselect` method before the `select` method', async () => {
-    const results: ('select' | 'deselect')[] = [];
-    characterSelection.deselect.mockImplementation(() => results.push('deselect'));
-    characterSelection.select.mockImplementation(() => results.push('select'));
+  it('should add character selection when the crowded image wrapper button is clicked', async () => {
     const user = userEvent.setup();
     await renderComponent();
-    const imageElement = screen.getByRole('img', { name: /crowded .* waldo/i });
-    for (let i = 0; i < 7; i++) {
-      await user.click(imageElement);
-      expect(results).toStrictEqual(['deselect', 'select']);
-      results.splice(0);
+    await user.click(screen.getByRole('button', { name: /select.* character/i }));
+    expect(characterSelection.select).toHaveBeenCalledOnce();
+    expect(characterSelection.deselect).not.toHaveBeenCalled();
+  });
+
+  it.only('should add character selection when `Enter` pressed while focusing the crowded image wrapper button', async () => {
+    const user = userEvent.setup();
+    await renderComponent();
+    await user.click(screen.getByRole('button', { name: /select.* character/i }));
+    await user.keyboard('{Enter}');
+    expect(characterSelection.select).toHaveBeenCalledTimes(2);
+    expect(characterSelection.deselect).not.toHaveBeenCalled();
+  });
+
+  it('should remove character selection on a click that occurs outside the crowded image', async () => {
+    const user = userEvent.setup();
+    await renderComponent();
+    const crowd = screen.getByRole('img', { name: /crowded .* waldo/i })!;
+    const { top, left, right, bottom } = crowd.getBoundingClientRect();
+    const pointsOutsideCrowd = [
+      { x: right + 1, y: bottom + 1 },
+      { x: left - 1, y: bottom - 1 },
+      { x: right + 1, y: top - 1 },
+      { x: left - 1, y: top - 1 },
+      { x: right, y: bottom + 1 },
+      { x: right + 1, y: bottom },
+      { x: left, y: top - 1 },
+      { x: left - 1, y: top },
+    ];
+    for (const coords of pointsOutsideCrowd) {
+      await user.pointer({ keys: '[MouseLeft]', coords });
     }
-  });
-
-  it('should call `CharacterSelection` `deselect` method only on any click', async () => {
-    const user = userEvent.setup();
-    await renderComponent();
-    await user.click(screen.getAllByRole('heading')[0]);
     expect(characterSelection.select).not.toHaveBeenCalled();
-    expect(characterSelection.deselect).toHaveBeenCalledOnce();
+    expect(characterSelection.deselect).toHaveBeenCalledTimes(pointsOutsideCrowd.length);
   });
 
-  it('should call `CharacterSelection` `deselect` method only on press `Escape`', async () => {
+  it('should remove character selection when `Escape` is pressed', async () => {
     const user = userEvent.setup();
     await renderComponent();
     await user.click(screen.getByRole('img', { name: /crowded .* waldo/i }));
     characterSelection.deselect.mockClear();
     await user.keyboard('{Escape}');
-    expect(characterSelection.deselect).toHaveBeenCalledTimes(1);
-  });
-
-  it('should call `CharacterSelection` `deselect` method only on press `Tab`', async () => {
-    const user = userEvent.setup();
-    await renderComponent();
-    await user.click(screen.getByRole('img', { name: /crowded .* waldo/i }));
-    characterSelection.deselect.mockClear();
-    await user.keyboard('{Tab}');
     expect(characterSelection.deselect).toHaveBeenCalledTimes(1);
   });
 });

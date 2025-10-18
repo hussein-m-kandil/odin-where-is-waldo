@@ -24,27 +24,35 @@ export class App implements OnDestroy {
   protected readonly characterSelection = inject(CharacterSelection);
   protected readonly characters = inject(Characters);
 
-  protected readonly removeCharacterSelection = () => {
-    this.characterSelection.deselect();
+  protected readonly removeCharacterSelection = () => this.characterSelection.deselect();
+  protected readonly removeCharacterSelectionOnClickOutside = (e: MouseEvent) => {
+    const { top, left, right, bottom } = this._crowdedImage().nativeElement.getBoundingClientRect();
+    if (e.x < left || e.x > right || e.y < top || e.y > bottom) {
+      this.removeCharacterSelection();
+    }
+  };
+  protected readonly removeCharacterSelectionOnEscape = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') this.removeCharacterSelection();
   };
 
   constructor() {
     afterNextRender({
       write: () => {
-        // Remove the selection on window-click in the capture phase (before other handlers),
-        // if the click occurs on the crowded image, the selection will be made again,
-        // otherwise it remains removed
-        window.addEventListener('click', this.removeCharacterSelection, true);
-        // window.addEventListener('keydown', ())
+        document.addEventListener('click', this.removeCharacterSelectionOnClickOutside);
+        document.addEventListener('keydown', this.removeCharacterSelectionOnEscape);
       },
     });
   }
 
   ngOnDestroy(): void {
-    window.removeEventListener('click', this.removeCharacterSelection, true);
+    document.removeEventListener('click', this.removeCharacterSelectionOnClickOutside);
+    document.removeEventListener('keydown', this.removeCharacterSelectionOnEscape);
   }
 
   protected selectCharacter(e: MouseEvent) {
+    // Stop propagation to prevent removing the selection under any circumstances,
+    // e.g., in case of selecting by pressing Enter key while focusing the target (button)
+    e.stopPropagation();
     const point = { x: Math.trunc(e.clientX), y: Math.trunc(e.clientY) };
     const imageElement = this._crowdedImage().nativeElement;
     this.characterSelection.select(imageElement, point);
