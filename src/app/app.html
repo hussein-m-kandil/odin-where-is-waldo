@@ -2,10 +2,15 @@
   <nav class="pt-2 px-4 bg-white flex flex-wrap gap-2 *:mx-auto shadow-sm">
     <h1 class="text-4xl font-extrabold text-center text-red-700">Where's Waldo?</h1>
     <div class="self-end flex">
-      @for (c of characters.data; track c.src) {
+      @for (character of characters.data; track character.name) {
       <!-- prettier-ignore -->
       @let size = 45;
-      <img [width]="size" [height]="size" [ngSrc]="c.src" [alt]="c.alt" />
+      <img
+        [width]="size"
+        [height]="size"
+        [alt]="character.image.alt"
+        [ngSrc]="character.image.src"
+      />
       }
     </div>
   </nav>

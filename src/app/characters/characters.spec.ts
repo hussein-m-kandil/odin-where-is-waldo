@@ -19,8 +19,9 @@ describe('Characters', () => {
     expect(service.data).toBeInstanceOf(Array);
     expect(service.data.length).toBeGreaterThan(0);
     for (const character of service.data) {
-      expect(character.src).toBeTypeOf('string');
-      expect(character.alt).toBeTypeOf('string');
+      expect(character.name).toBeTypeOf('string');
+      expect(character.image.src).toBeTypeOf('string');
+      expect(character.image.alt).toBeTypeOf('string');
     }
   });
 
