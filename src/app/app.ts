@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { CharacterMenu } from './characters/character-selection/character-menu/character-menu';
 import { CharacterSelection } from './characters/character-selection/character-selection';
+import { Character } from './characters/characters.types';
 import { Characters } from './characters/characters';
 import { NgOptimizedImage } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
@@ -56,5 +57,10 @@ export class App implements OnDestroy {
     const point = { x: Math.trunc(e.clientX), y: Math.trunc(e.clientY) };
     const imageElement = this._crowdedImage().nativeElement;
     this.characterSelection.select(imageElement, point);
+  }
+
+  protected evaluateSelectedCharacter(name: Character['name']) {
+    this.characterSelection.evaluate(name);
+    this.removeCharacterSelection();
   }
 }

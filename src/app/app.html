@@ -41,6 +41,7 @@
   <app-character-menu
     [imageElement]="characterSelection.imageElement"
     [selectedPoint]="characterSelection.selectedPoint"
+    (characterSelected)="evaluateSelectedCharacter($event)"
   />
   }
 </main>

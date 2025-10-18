@@ -2,10 +2,13 @@ import { CharacterSelection } from './characters/character-selection/character-s
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/angular';
 import { userEvent } from '@testing-library/user-event';
+import { Characters } from './characters/characters';
 import { appConfig } from './app.config';
 import { App } from './app';
 
-const characterSelection = { select: vi.fn(), deselect: vi.fn() };
+const characters = new Characters();
+
+const characterSelection = { select: vi.fn(), deselect: vi.fn(), evaluate: vi.fn() };
 
 const renderComponent = async () => {
   // The `providers` prop is provided at the module level ('root')
@@ -28,10 +31,9 @@ describe('App', () => {
 
   it('should render images for Waldo and his friends', async () => {
     await renderComponent();
-    expect(screen.getByRole('img', { name: /of waldo/i })).toBeVisible();
-    expect(screen.getByRole('img', { name: /of odlaw/i })).toBeVisible();
-    expect(screen.getByRole('img', { name: /of wilma/i })).toBeVisible();
-    expect(screen.getByRole('img', { name: /of (wizard|whitebeard)/i })).toBeVisible();
+    for (const character of characters.data) {
+      expect(screen.getByRole('img', { name: character.image.alt })).toBeVisible();
+    }
   });
 
   it('should render crowded illustration, where we can find Waldo', async () => {
@@ -93,5 +95,16 @@ describe('App', () => {
     characterSelection.deselect.mockClear();
     await user.keyboard('{Escape}');
     expect(characterSelection.deselect).toHaveBeenCalledTimes(1);
+  });
+
+  it('should evaluate the selected character, then remove the character selection', async () => {
+    const user = userEvent.setup();
+    await renderComponent();
+    for (const character of characters.data) {
+      await user.click(screen.getByRole('img', { name: /crowded .* waldo/i }));
+      await user.click(screen.getByRole('img', { name: character.image.alt }));
+    }
+    expect(characterSelection.evaluate).toHaveBeenCalledTimes(characters.data.length);
+    expect(characterSelection.deselect).toHaveBeenCalledTimes(characters.data.length);
   });
 });
