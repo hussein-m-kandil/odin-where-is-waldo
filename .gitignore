@@ -44,3 +44,6 @@ Thumbs.db
 
 # Webhint
 .hintrc
+
+# Angular production environment
+src/environments/environment.ts
