@@ -1,13 +1,21 @@
-import { Point, SelectedPoint } from './character-selection.types';
-import { signal, Injectable } from '@angular/core';
-import { Character } from '../characters.types';
+import { Point, Finder, SelectedPoint, EvaluationResult } from './character-selection.types';
+import { environment } from '../../../environments/environment';
+import { signal, Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { tap } from 'rxjs';
+
+const baseUrl = environment.baseUrl;
 
 @Injectable({
   providedIn: 'root',
 })
 export class CharacterSelection {
   private _imageElement: HTMLImageElement | null = null;
+
   private readonly _selectedPoint = signal<SelectedPoint | null>(null);
+  private readonly _validSelections = signal<Record<string, Point>>({});
+
+  private readonly _http = inject(HttpClient);
 
   get imageElement(): typeof this._imageElement {
     return this._imageElement;
@@ -38,50 +46,28 @@ export class CharacterSelection {
       y: Math.trunc(relative.y * scaleFactor),
     };
     this._setSelectionState(imageElement, { absolute: absolutePoint, relative, natural });
-    console.log(this._selectedPoint()?.natural); // TODO: Delete this line!
   }
 
   deselect() {
     this._setSelectionState(null, null);
   }
 
-  evaluate(selectedCharacterName: Character['name']): boolean {
-    const selectedPoint = this._selectedPoint();
-    if (selectedPoint) {
-      const characters = [
-        {
-          name: 'waldo',
-          position: { minX: 2140, maxX: 2245, minY: 1140, maxY: 1260 },
+  evaluate(characterName: string, selectedPoint: Point, finderId: Finder['id']) {
+    const allSelections: ReturnType<typeof this._validSelections> = {
+      ...this._validSelections(),
+      [characterName]: selectedPoint,
+    };
+    return this._http.post<EvaluationResult>(`${baseUrl}/eval/${finderId}`, allSelections).pipe(
+      tap({
+        next: ({ evaluation }: EvaluationResult) => {
+          const validEvaluation = evaluation[characterName];
+          if (validEvaluation) this._validSelections.set(allSelections);
         },
-        {
-          name: 'odlaw',
-          position: { minX: 790, maxX: 840, minY: 1010, maxY: 1060 },
-        },
-        {
-          name: 'wilma',
-          position: { minX: 1230, maxX: 1280, minY: 650, maxY: 700 },
-        },
-        {
-          name: 'wizard',
-          position: { minX: 145, maxX: 215, minY: 1150, maxY: 1265 },
-        },
-      ];
-      const selected = selectedPoint.natural;
-      for (const { name, position } of characters) {
-        console.log({ [name]: position }, { [selectedCharacterName]: selected });
-        if (
-          name === selectedCharacterName &&
-          selected.x > position.minX &&
-          selected.x < position.maxX &&
-          selected.y > position.minY &&
-          selected.y < position.maxY
-        ) {
-          alert(`${selectedCharacterName} found ;)`);
-          return true;
-        }
-      }
-    }
-    alert(`${selectedCharacterName} not found :(`);
-    return false;
+      })
+    );
+  }
+
+  getFoundCharacters(): string[] {
+    return Object.keys(this._validSelections());
   }
 }

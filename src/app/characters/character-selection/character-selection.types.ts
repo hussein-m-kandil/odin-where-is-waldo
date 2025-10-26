@@ -1,3 +1,6 @@
+import { Finder } from '../../finder/finder.types';
+export type { Finder };
+
 export interface Point {
   x: number;
   y: number;
@@ -14,4 +17,11 @@ export interface Placement {
   width: number;
   left: number;
   top: number;
+}
+
+export type Evaluation = Partial<Record<string, boolean>>;
+
+export interface EvaluationResult {
+  evaluation: Evaluation;
+  finder: Finder;
 }
