@@ -16,33 +16,74 @@
   </nav>
 </header>
 <main>
-  <div
-    class="relative w-full max-w-[100vh] mx-auto mt-[10vh] overflow-hidden focus-within:outline-2"
+  @let _notification = notification();
+  <p
+    class="my-8 text-center"
+    [class]="{
+      'text-red-700': _notification.type === 'error',
+      'text-green-700': _notification.type === 'success'
+    }"
   >
-    <div class="pt-[63.3984%]">
-      <!-- Fill the parent's height relative to its width (old school `aspect-ratio`) -->
-    </div>
+    {{ _notification.message || 'Please, help us find Waldo and his friends, ASAP!' }}
+  </p>
+  @if (!finder()) {
+  <div class="text-center">
     <button
       type="button"
-      aria-label="Select a character"
-      (click)="selectCharacter($event)"
-      class="absolute top-0 left-0 right-0 bottom-0"
+      (click)="start()"
+      [disabled]="loading()"
+      [class]="`py-2 px-4 rounded-2xl min-w-32 shadow-sm font-bold border-1
+      disabled:text-gray-500 active:not-disabled:bg-gray-100 hover:not-disabled:shadow-md`"
     >
-      <img
-        fill
-        #crowd
-        priority
-        ngSrc="/where-is-waldo-winter.jpg"
-        alt="A crowded illustration shows Waldo and his friends skiing on an icy mountain."
-      />
+      {{`Start${loading() ? 'ing...' : '' }`}}
     </button>
   </div>
-  @if (characterSelection.selectedPoint && characterSelection.imageElement) {
-  <app-character-menu
-    [imageElement]="characterSelection.imageElement"
-    [selectedPoint]="characterSelection.selectedPoint"
-    (characterSelected)="evaluateSelectedCharacter($event)"
-  />
+  } @else {
+  <div class="max-w-3xl mx-auto overflow-hidden">
+    <div class="text-center p-2 space-x-4 flex justify-between border-1 border-b-0">
+      <span>
+        Elapsed seconds:
+        <span class="font-bold">
+          @let seconds = (secTimer$() | async) || 0;
+          {{ seconds < 10000 ? seconds : seconds.toExponential(0) }}
+        </span>
+      </span>
+      <span
+        >Found characters:
+        <span class="font-bold">{{ characterSelection.getFoundCharacters().length }}</span></span
+      >
+    </div>
+    <div class="relative w-full focus-within:outline-1 border-1">
+      <div class="pt-[63.3984%]">
+        <!-- Fill the parent's height relative to its width (old school `aspect-ratio`) -->
+      </div>
+      <button
+        type="button"
+        aria-label="Select a character"
+        [class]="{ 'saturate-50': loading() }"
+        class="absolute top-0 left-0 right-0 bottom-0"
+        (click)="!loading() && selectCharacter($event)"
+      >
+        <img
+          fill
+          #crowd
+          priority
+          ngSrc="/where-is-waldo-winter.jpg"
+          alt="A crowded illustration shows Waldo and his friends skiing on an icy mountain."
+        />
+      </button>
+      @if (loading()) {
+      <span class="absolute top-0 left-0 right-0 bottom-0 bg-white/50 animate-pulse"></span>
+      }
+    </div>
+    @if (characterSelection.selectedPoint && characterSelection.imageElement) {
+    <app-character-menu
+      [imageElement]="characterSelection.imageElement"
+      [selectedPoint]="characterSelection.selectedPoint"
+      (characterSelected)="evaluateSelectedCharacter($event)"
+    />
+    }
+  </div>
   }
 </main>
 <router-outlet />
