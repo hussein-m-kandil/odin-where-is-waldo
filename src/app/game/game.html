@@ -27,19 +27,10 @@
     {{`Start${loading() ? 'ing...' : '' }`}}
   </button>
   } @else {
-  <div class="p-2 space-x-4 flex justify-between">
-    <span>
-      Elapsed seconds:
-      <span class="font-bold">
-        @let seconds = (secTimer$() | async) || 0;
-        {{ seconds < 10000 ? seconds : seconds.toExponential(0) }}
-      </span>
-    </span>
-    <span
-      >Found characters:
-      <span class="font-bold">{{ characterSelection.getFoundCharacters().length }}</span></span
-    >
-  </div>
+  <app-stats
+    class="border-t-1"
+    [foundCharacters]="characterSelection.getFoundCharacters().length"
+  />
   <div>
     <div class="relative overflow-hidden">
       <div class="pt-[63.3984%]">

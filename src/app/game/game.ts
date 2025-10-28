@@ -1,7 +1,6 @@
 import {
   inject,
   signal,
-  computed,
   Component,
   OnDestroy,
   viewChild,
@@ -10,17 +9,18 @@ import {
 } from '@angular/core';
 import { CharacterMenu } from './characters/character-selection/character-menu/character-menu';
 import { CharacterSelection } from './characters/character-selection/character-selection';
-import { AsyncPipe, NgOptimizedImage } from '@angular/common';
+import { NgOptimizedImage } from '@angular/common';
 import { Character } from './characters/characters.types';
 import { FinderService } from './finder/finder-service';
 import { Characters } from './characters/characters';
 import { Notifier } from './notifier/notifier';
 import { Finder } from './finder/finder.types';
-import { finalize, interval, of } from 'rxjs';
+import { Stats } from './stats/stats';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-game',
-  imports: [NgOptimizedImage, CharacterMenu, AsyncPipe],
+  imports: [NgOptimizedImage, CharacterMenu, Stats],
   templateUrl: './game.html',
 })
 export class Game implements OnDestroy {
@@ -30,11 +30,6 @@ export class Game implements OnDestroy {
   protected readonly finder = signal<Finder | null>(null);
 
   protected readonly notifier = inject(Notifier);
-
-  protected readonly secTimer$ = computed(() => {
-    if (this.finder()) return interval(1000);
-    return of(0);
-  });
 
   protected readonly loading = signal(false);
 
