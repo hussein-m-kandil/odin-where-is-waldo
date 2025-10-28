@@ -6,7 +6,7 @@
     <img [width]="size" [height]="size" [alt]="character.image.alt" [ngSrc]="character.image.src" />
     }
   </div>
-  @let _notification = notification();
+  @let _notification = notifier.notification;
   <p
     class="p-2 font-bold"
     [class]="{

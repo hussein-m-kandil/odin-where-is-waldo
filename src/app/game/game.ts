@@ -1,13 +1,12 @@
 import {
   inject,
   signal,
-  effect,
+  computed,
   Component,
   OnDestroy,
   viewChild,
   ElementRef,
   afterNextRender,
-  computed,
 } from '@angular/core';
 import { CharacterMenu } from './characters/character-selection/character-menu/character-menu';
 import { CharacterSelection } from './characters/character-selection/character-selection';
@@ -15,13 +14,9 @@ import { AsyncPipe, NgOptimizedImage } from '@angular/common';
 import { Character } from './characters/characters.types';
 import { FinderService } from './finder/finder-service';
 import { Characters } from './characters/characters';
+import { Notifier } from './notifier/notifier';
 import { Finder } from './finder/finder.types';
 import { finalize, interval, of } from 'rxjs';
-
-interface Notification {
-  type: 'error' | 'success' | 'normal';
-  message: string;
-}
 
 @Component({
   selector: 'app-game',
@@ -34,26 +29,14 @@ export class Game implements OnDestroy {
   protected readonly characters = inject(Characters);
   protected readonly finder = signal<Finder | null>(null);
 
+  protected readonly notifier = inject(Notifier);
+
   protected readonly secTimer$ = computed(() => {
     if (this.finder()) return interval(1000);
     return of(0);
   });
 
   protected readonly loading = signal(false);
-  protected readonly notification = signal<Notification>({ type: 'normal', message: '' });
-  private _notificationTimeoutID = 0;
-  private _toastResettingEffect = effect((onCleanup) => {
-    if (this.notification().message) {
-      this._notificationTimeoutID = setTimeout(
-        () => this.notification.set({ message: '', type: 'normal' }),
-        3000
-      );
-      onCleanup(() => {
-        clearTimeout(this._notificationTimeoutID);
-        this._notificationTimeoutID = 0;
-      });
-    }
-  });
 
   protected readonly characterSelection = inject(CharacterSelection);
   private readonly _removeCharacterSelection = () => this.characterSelection.deselect();
@@ -92,7 +75,7 @@ export class Game implements OnDestroy {
         .pipe(finalize(() => setTimeout(() => this.loading.set(false), 1000)))
         .subscribe({
           next: (finder) => this.finder.set(finder),
-          error: () => this.notification.set({ message: 'Failed to start!', type: 'error' }),
+          error: () => this.notifier.notify({ message: 'Failed to start!', type: 'error' }),
         });
     }
   }
@@ -127,15 +110,15 @@ export class Game implements OnDestroy {
                   ? 'The Wizard'
                   : `${name[0].toUpperCase()}${name.slice(1).toLowerCase()}`;
               if (evaluation[name]) {
-                this.notification.set({ message: `Yes, this is ${displayName}!`, type: 'success' });
+                this.notifier.notify({ message: `Yes, this is ${displayName}!`, type: 'success' });
               } else
-                this.notification.set({
+                this.notifier.notify({
                   message: `No, this is not ${displayName}!`,
                   type: 'error',
                 });
             },
             error: () =>
-              this.notification.set({
+              this.notifier.notify({
                 message: 'Sorry, your selection could not be evaluated!',
                 type: 'error',
               }),
