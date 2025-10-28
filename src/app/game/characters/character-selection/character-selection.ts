@@ -1,5 +1,5 @@
 import { Point, Finder, SelectedPoint, EvaluationResult } from './character-selection.types';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../../environments/environment';
 import { signal, Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs';

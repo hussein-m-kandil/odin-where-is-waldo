@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/angular';
+import { userEvent } from '@testing-library/user-event';
+import { appConfig } from '../../../../app.config';
 import { CharacterMenu } from './character-menu';
-import { appConfig } from '../../../app.config';
-import userEvent from '@testing-library/user-event';
 
 const rect = new DOMRect(...Object.values({ x: 10, y: 10, w: 1600, h: 900 }));
 const mockImageRect = vi.fn(() => rect);

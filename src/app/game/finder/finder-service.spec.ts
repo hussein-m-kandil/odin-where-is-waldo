@@ -1,11 +1,11 @@
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
-import { environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
+import { finder, localStorageMock } from '../../../test/utils';
 import { provideHttpClient } from '@angular/common/http';
 import { describe, expect, it, vi } from 'vitest';
 import { FinderService } from './finder-service';
 import { TestBed } from '@angular/core/testing';
-import { finder, localStorageMock } from '../../test/utils';
 
 const { baseUrl } = environment;
 

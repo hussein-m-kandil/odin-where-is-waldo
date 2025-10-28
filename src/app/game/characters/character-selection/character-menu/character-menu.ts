@@ -1,14 +1,13 @@
 import { Placement, Point, SelectedPoint } from '../character-selection.types';
 import { Component, computed, inject, input, output } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
-import { Characters } from '../../characters';
 import { Character } from '../../characters.types';
+import { Characters } from '../../characters';
 
 @Component({
   selector: 'app-character-menu',
   imports: [NgOptimizedImage],
   templateUrl: './character-menu.html',
-  styleUrl: './character-menu.css',
 })
 export class CharacterMenu {
   readonly characters = inject(Characters);

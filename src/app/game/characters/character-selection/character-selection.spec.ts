@@ -1,12 +1,12 @@
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../../environments/environment';
 import { provideZonelessChangeDetection } from '@angular/core';
+import { EvaluationResult } from './character-selection.types';
 import { CharacterSelection } from './character-selection';
 import { provideHttpClient } from '@angular/common/http';
+import { finder } from '../../../../test/utils';
 import { TestBed } from '@angular/core/testing';
 import { describe, expect, it } from 'vitest';
-import { finder } from '../../../test/utils';
-import { EvaluationResult } from './character-selection.types';
 
 const { baseUrl } = environment;
 

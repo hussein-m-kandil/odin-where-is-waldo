@@ -1,13 +1,13 @@
+import { provideZonelessChangeDetection } from '@angular/core';
 import { describe, beforeEach, expect, it } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { Characters } from './characters';
-import { appConfig } from '../app.config';
 
 describe('Characters', () => {
   let service: Characters;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({ providers: appConfig.providers });
+    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
     service = TestBed.inject(Characters);
   });
 
