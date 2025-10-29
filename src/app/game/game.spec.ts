@@ -6,7 +6,7 @@ import {
 import { CharacterSelection } from './characters/character-selection/character-selection';
 import { render, screen, waitForElementToBeRemoved } from '@testing-library/angular';
 import { provideZonelessChangeDetection, signal } from '@angular/core';
-import { afterEach, describe, expect, it, vi, Mock } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { userEvent } from '@testing-library/user-event';
 import { Characters } from './characters/characters';
 import { HttpResponse } from '@angular/common/http';
@@ -17,9 +17,7 @@ import { Game } from './game';
 
 const characters = new Characters();
 
-const finders: Record<keyof Omit<Finders, '_http'>, Mock> = {
-  createFinder: vi.fn(() => of(finder)),
-};
+const finders = { createFinder: vi.fn(() => of(finder)) };
 
 class CharacterSelectionMock {
   private _imageElement: HTMLImageElement | null = null;

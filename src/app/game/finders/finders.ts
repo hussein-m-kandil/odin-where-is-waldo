@@ -11,6 +11,10 @@ const baseUrl = `${environment.baseUrl}/finders`;
 export class Finders {
   private readonly _http = inject(HttpClient);
 
+  getAllFinders() {
+    return this._http.get<Finder[]>(baseUrl);
+  }
+
   createFinder() {
     return this._http.post<Finder>(baseUrl, {});
   }

@@ -26,7 +26,16 @@
   >
     {{`Start${loading() ? 'ing...' : '' }`}}
   </button>
-  } @else {
+  @let _allFinders = allFinders(); @if (_allFinders.length > 0) {
+  <div class="p-2 space-y-2">
+    <h2 class="text-2xl font-bold m-0">Winners</h2>
+    @for (f of _allFinders; track f.id) {
+    <div>
+      {{ f.name }}: <span class="font-bold">{{ f.duration }}</span> seconds
+    </div>
+    }
+  </div>
+  } } @else {
   <app-stats
     class="border-t-1"
     [foundCharacters]="characterSelection.getFoundCharacters().length"

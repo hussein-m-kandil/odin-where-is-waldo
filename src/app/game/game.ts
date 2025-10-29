@@ -31,6 +31,7 @@ export class Game implements OnDestroy {
   private readonly _finders = inject(Finders);
 
   protected readonly finder = signal<Finder | null>(null);
+  protected readonly allFinders = signal<Finder[]>([]);
   protected readonly loading = signal(false);
 
   protected readonly characterSelection = inject(CharacterSelection);
@@ -53,6 +54,7 @@ export class Game implements OnDestroy {
       write: () => {
         document.addEventListener('click', this._removeCharacterSelectionOnClickOutside);
         document.addEventListener('keydown', this._removeCharacterSelectionOnEscape);
+        this._finders.getAllFinders().subscribe(this.allFinders.set); // TODO: To be enhanced!
       },
     });
   }

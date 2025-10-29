@@ -17,3 +17,8 @@ export const finder = {
   name: 'Anonymous',
   duration: null,
 };
+export const allFinders = [
+  { ...finder, id: crypto.randomUUID(), duration: 3 },
+  { ...finder, id: crypto.randomUUID(), duration: 7 },
+  { ...finder, id: crypto.randomUUID(), duration: 9 },
+];
