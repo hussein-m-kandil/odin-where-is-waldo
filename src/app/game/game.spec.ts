@@ -6,18 +6,21 @@ import {
 import { CharacterSelection } from './characters/character-selection/character-selection';
 import { render, screen, waitForElementToBeRemoved } from '@testing-library/angular';
 import { provideZonelessChangeDetection, signal } from '@angular/core';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, Mock, vi } from 'vitest';
 import { userEvent } from '@testing-library/user-event';
+import { allFinders, finder } from '../../test/utils';
 import { Characters } from './characters/characters';
 import { HttpResponse } from '@angular/common/http';
 import { Finders } from './finders/finders';
-import { finder } from '../../test/utils';
 import { of, throwError } from 'rxjs';
 import { Game } from './game';
 
 const characters = new Characters();
 
-const finders = { createFinder: vi.fn(() => of(finder)) };
+const finders: Record<keyof Omit<Finders, '_http'>, Mock> = {
+  getAllFinders: vi.fn(() => of(allFinders)),
+  createFinder: vi.fn(() => of(finder)),
+};
 
 class CharacterSelectionMock {
   private _imageElement: HTMLImageElement | null = null;
@@ -42,10 +45,10 @@ class CharacterSelectionMock {
 
 const characterSelection = new CharacterSelectionMock();
 
-const renderComponent = async () => {
+const renderComponent = () => {
   // The `providers` prop is provided at the module level ('root')
   // https://testing-library.com/docs/angular-testing-library/api#providers
-  return await render(Game, {
+  return render(Game, {
     providers: [
       provideZonelessChangeDetection(),
       { provide: CharacterSelection, useValue: characterSelection },

@@ -9,18 +9,19 @@ import {
 } from '@angular/core';
 import { CharacterMenu } from './characters/character-selection/character-menu/character-menu';
 import { CharacterSelection } from './characters/character-selection/character-selection';
-import { NgOptimizedImage } from '@angular/common';
+import { FinderList } from './finders/finder-list/finder-list';
 import { Character } from './characters/characters.types';
 import { Characters } from './characters/characters';
-import { Notifier } from './notifier/notifier';
+import { NgOptimizedImage } from '@angular/common';
 import { Finder } from './finders/finders.types';
+import { Notifier } from './notifier/notifier';
 import { Finders } from './finders/finders';
 import { Stats } from './stats/stats';
 import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-game',
-  imports: [NgOptimizedImage, CharacterMenu, Stats],
+  imports: [NgOptimizedImage, CharacterMenu, FinderList, Stats],
   templateUrl: './game.html',
 })
 export class Game implements OnDestroy {
@@ -31,7 +32,6 @@ export class Game implements OnDestroy {
   private readonly _finders = inject(Finders);
 
   protected readonly finder = signal<Finder | null>(null);
-  protected readonly allFinders = signal<Finder[]>([]);
   protected readonly loading = signal(false);
 
   protected readonly characterSelection = inject(CharacterSelection);
@@ -54,7 +54,6 @@ export class Game implements OnDestroy {
       write: () => {
         document.addEventListener('click', this._removeCharacterSelectionOnClickOutside);
         document.addEventListener('keydown', this._removeCharacterSelectionOnEscape);
-        this._finders.getAllFinders().subscribe(this.allFinders.set); // TODO: To be enhanced!
       },
     });
   }
