@@ -6,18 +6,20 @@ import {
 import { CharacterSelection } from './characters/character-selection/character-selection';
 import { render, screen, waitForElementToBeRemoved } from '@testing-library/angular';
 import { provideZonelessChangeDetection, signal } from '@angular/core';
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { FinderService } from './finder/finder-service';
+import { afterEach, describe, expect, it, vi, Mock } from 'vitest';
 import { userEvent } from '@testing-library/user-event';
 import { Characters } from './characters/characters';
 import { HttpResponse } from '@angular/common/http';
+import { Finders } from './finders/finders';
 import { finder } from '../../test/utils';
 import { of, throwError } from 'rxjs';
 import { Game } from './game';
 
 const characters = new Characters();
 
-const finderService = { getFinder: vi.fn(() => of(finder)) };
+const finders: Record<keyof Omit<Finders, '_http'>, Mock> = {
+  createFinder: vi.fn(() => of(finder)),
+};
 
 class CharacterSelectionMock {
   private _imageElement: HTMLImageElement | null = null;
@@ -49,7 +51,7 @@ const renderComponent = async () => {
     providers: [
       provideZonelessChangeDetection(),
       { provide: CharacterSelection, useValue: characterSelection },
-      { provide: FinderService, useValue: finderService },
+      { provide: Finders, useValue: finders },
     ],
   });
 };
@@ -70,7 +72,7 @@ describe('Game', () => {
   });
 
   it('should render the starting button, while loading start data', async () => {
-    finderService.getFinder.mockImplementationOnce(() =>
+    finders.createFinder.mockImplementationOnce(() =>
       throwError(() => new HttpResponse({ status: 500, statusText: 'internal server error' }))
     );
     const user = userEvent.setup();
@@ -81,7 +83,7 @@ describe('Game', () => {
   });
 
   it('should re-render the start button again, if failed to start', async () => {
-    finderService.getFinder.mockImplementationOnce(() =>
+    finders.createFinder.mockImplementationOnce(() =>
       throwError(() => new HttpResponse({ status: 500, statusText: 'internal server error' }))
     );
     const user = userEvent.setup();

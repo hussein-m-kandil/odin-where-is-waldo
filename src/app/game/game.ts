@@ -11,10 +11,10 @@ import { CharacterMenu } from './characters/character-selection/character-menu/c
 import { CharacterSelection } from './characters/character-selection/character-selection';
 import { NgOptimizedImage } from '@angular/common';
 import { Character } from './characters/characters.types';
-import { FinderService } from './finder/finder-service';
 import { Characters } from './characters/characters';
 import { Notifier } from './notifier/notifier';
-import { Finder } from './finder/finder.types';
+import { Finder } from './finders/finders.types';
+import { Finders } from './finders/finders';
 import { Stats } from './stats/stats';
 import { finalize } from 'rxjs';
 
@@ -25,12 +25,12 @@ import { finalize } from 'rxjs';
 })
 export class Game implements OnDestroy {
   private readonly _crowdedImage = viewChild<ElementRef<HTMLImageElement>>('crowd');
-  private readonly _finderService = inject(FinderService);
+
   protected readonly characters = inject(Characters);
-  protected readonly finder = signal<Finder | null>(null);
-
   protected readonly notifier = inject(Notifier);
+  private readonly _finders = inject(Finders);
 
+  protected readonly finder = signal<Finder | null>(null);
   protected readonly loading = signal(false);
 
   protected readonly characterSelection = inject(CharacterSelection);
@@ -65,8 +65,8 @@ export class Game implements OnDestroy {
   protected start() {
     if (!this.loading()) {
       this.loading.set(true);
-      this._finderService
-        .getFinder()
+      this._finders
+        .createFinder()
         .pipe(finalize(() => setTimeout(() => this.loading.set(false), 1000)))
         .subscribe({
           next: (finder) => this.finder.set(finder),

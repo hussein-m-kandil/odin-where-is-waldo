@@ -1,4 +1,4 @@
-import { Finder } from '../../finder/finder.types';
+import { Finder } from '../../finders/finders.types';
 export type { Finder };
 
 export interface Point {

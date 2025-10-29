@@ -1,11 +1,11 @@
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { finder, localStorageMock } from '../../../test/utils';
 import { provideHttpClient } from '@angular/common/http';
-import { describe, expect, it, vi } from 'vitest';
-import { FinderService } from './finder-service';
 import { TestBed } from '@angular/core/testing';
+import { describe, expect, it } from 'vitest';
+import { finder } from '../../../test/utils';
+import { Finders } from './finders';
 
 const { baseUrl } = environment;
 
@@ -14,12 +14,12 @@ const setup = () => {
     providers: [provideHttpClient(), provideHttpClientTesting(), provideZonelessChangeDetection()],
   });
   const httpTesting = TestBed.inject(HttpTestingController);
-  const service = TestBed.inject(FinderService);
-  const finder$ = service.getFinder();
+  const service = TestBed.inject(Finders);
+  const finder$ = service.createFinder();
   return { httpTesting, service, finder$ };
 };
 
-describe('FinderService', () => {
+describe('Finders', () => {
   it('should create new finder', () => {
     const { finder$, httpTesting } = setup();
     let resData: unknown;
@@ -34,23 +34,5 @@ describe('FinderService', () => {
     expect(resData).toStrictEqual(finder);
     expect(resError).toBeUndefined();
     httpTesting.verify();
-  });
-
-  it('should verify old finder', async () => {
-    const originalLocalStorage = window.localStorage;
-    window.localStorage = { ...localStorageMock, getItem: vi.fn(() => finder.id) };
-    const { finder$, httpTesting } = setup();
-    let resData: unknown;
-    let resError: unknown;
-    finder$.subscribe({ next: (d) => (resData = d), error: (e) => (resError = e) });
-    const req = httpTesting.expectOne(
-      { method: 'GET', url: `${baseUrl}/finders/${finder.id}` },
-      'Request to verify an old finder'
-    );
-    req.flush(finder);
-    expect(resData).toStrictEqual(finder);
-    expect(resError).toBeUndefined();
-    httpTesting.verify();
-    window.localStorage = originalLocalStorage;
   });
 });
