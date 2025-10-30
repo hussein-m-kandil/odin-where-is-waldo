@@ -34,6 +34,12 @@ export class CharacterSelection {
     this._imageElement = imageElement;
   }
 
+  reset() {
+    this._imageElement = null;
+    this._selectedPoint.set(null);
+    this._validSelections.set({});
+  }
+
   select(imageElement: HTMLImageElement, absolutePoint: Point) {
     const scaleFactor = imageElement.naturalWidth / imageElement.clientWidth;
     const imgRect = imageElement.getBoundingClientRect();

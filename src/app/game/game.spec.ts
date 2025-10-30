@@ -31,6 +31,10 @@ class CharacterSelectionMock {
   get imageElement() {
     return this._imageElement;
   }
+  reset = vi.fn(() => {
+    this._imageElement = null;
+    this._selectedPoint.set(null);
+  });
   evaluate = vi.fn(() => of<EvaluationResult>({ evaluation: { waldo: true }, finder }));
   select = vi.fn((imageElement: HTMLImageElement, point: Point) => {
     this._selectedPoint.set({ absolute: point, relative: point, natural: point });
@@ -103,6 +107,15 @@ describe('Game', () => {
     await renderComponent();
     await user.click(screen.getByRole('button', { name: /start/i }));
     expect(await screen.findByRole('button', { name: /escape/i })).toBeVisible();
+  });
+
+  it('should reset game state on escape button clicked', async () => {
+    const user = userEvent.setup();
+    await renderComponent();
+    await user.click(screen.getByRole('button', { name: /start/i }));
+    await user.click(await screen.findByRole('button', { name: /escape/i }));
+    expect(await screen.findByRole('button', { name: /start/i })).toBeVisible();
+    expect(characterSelection.reset).toHaveBeenCalledOnce();
   });
 
   it('should render the crowded image where we can find Waldo, after successful start', async () => {

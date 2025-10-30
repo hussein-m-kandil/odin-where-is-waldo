@@ -77,7 +77,11 @@ export class Game implements OnDestroy {
   }
 
   protected escape() {
-    if (!this.loading()) this.finder.set(null);
+    if (!this.loading()) {
+      this.finder.set(null);
+      this.characterSelection.reset();
+      this.notifier.notify(this.notifier.defaultNotification, 0);
+    }
   }
 
   protected selectCharacter(e: MouseEvent) {

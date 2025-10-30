@@ -75,4 +75,27 @@ describe('CharacterSelection', () => {
       Array.from(new Set(names.filter((x) => x[1]).map((x) => x[0])))
     );
   });
+
+  it('should reset all state members', async () => {
+    const { service, httpTesting } = setup();
+    const point = { x: 0, y: 0 };
+    const characterName = 'waldo';
+    service.select(new Image(), point);
+    const evalRes: EvaluationResult = { evaluation: { [characterName]: true }, finder };
+    service.evaluate(characterName, point, finder.id).subscribe();
+    httpTesting
+      .expectOne(
+        { method: 'POST', url: `${baseUrl}/eval/${finder.id}` },
+        'Selection evaluation request'
+      )
+      .flush(evalRes);
+    httpTesting.verify();
+    expect(service.getFoundCharacters()).toStrictEqual([characterName]);
+    expect(service.selectedPoint).toHaveProperty('absolute', point);
+    expect(service.imageElement).toBeInstanceOf(HTMLImageElement);
+    service.reset();
+    expect(service.imageElement).toBeNull();
+    expect(service.selectedPoint).toBeNull();
+    expect(service.getFoundCharacters()).toStrictEqual([]);
+  });
 });
