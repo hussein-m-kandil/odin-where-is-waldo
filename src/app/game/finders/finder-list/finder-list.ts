@@ -1,4 +1,4 @@
-import { Component, inject, input, signal } from '@angular/core';
+import { input, signal, inject, Component, afterNextRender } from '@angular/core';
 import { Finder } from '../finders.types';
 import { Finders } from '../finders';
 import { finalize } from 'rxjs';
@@ -20,7 +20,7 @@ export class FinderList {
   protected readonly error = signal(false);
 
   constructor() {
-    this.loadFinders();
+    afterNextRender(() => this.loadFinders());
   }
 
   protected loadFinders() {
