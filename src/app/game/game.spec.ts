@@ -64,11 +64,29 @@ const renderComponent = () => {
 describe('Game', () => {
   afterEach(vi.resetAllMocks);
 
-  it('should render images for Waldo and his friends', async () => {
+  it('should render faded images of Waldo and his friends', async () => {
     await renderComponent();
     for (const character of characters.data) {
-      expect(screen.getByRole('img', { name: character.image.alt })).toBeVisible();
+      const img = screen.getByRole('img', { name: character.image.alt });
+      expect(img).toBeVisible();
+      expect(img).toHaveClass(/opacity-\d{1,2}/i, /saturate-\d{1,2}/i);
     }
+  });
+
+  it('should display a colorful image of the founded characters only', async () => {
+    const foundCharacters = characters.data.map((c) => c.name).filter(() => Math.random() > 0.5);
+    characterSelection.getFoundCharacters.mockImplementation(() => foundCharacters);
+    await renderComponent();
+    for (const character of characters.data) {
+      const img = screen.getByRole('img', { name: character.image.alt });
+      expect(img).toBeVisible();
+      if (foundCharacters.includes(character.name)) {
+        expect(img).not.toHaveClass(/opacity-\d{1,2}/i, /saturate-\d{1,2}/i);
+      } else {
+        expect(img).toHaveClass(/opacity-\d{1,2}/i, /saturate-\d{1,2}/i);
+      }
+    }
+    characterSelection.getFoundCharacters.mockReset();
   });
 
   it('should render the start button', async () => {
