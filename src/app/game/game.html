@@ -3,7 +3,7 @@
 @let _loading = loading();
 @let foundCharacters = characterSelection.getFoundCharacters();
 <div class="text-center border-1 border-t-0 *:border-t-1 *:border-black">
-  <div class="flex justify-center p-2 pb-0">
+  <div class="flex justify-center pt-2">
     @for (character of characters.data; track character.name) {
     <!-- prettier-ignore -->
     @let size = 45;
@@ -19,7 +19,7 @@
   </div>
   @let _notification = notifier.notification;
   <div
-    class="p-4 space-y-2 bg-black text-white font-bold"
+    class="p-2 space-y-1 bg-black text-white font-bold"
     [class]="{
       'bg-red-700': _notification.type === 'error',
       'bg-green-700': _notification.type === 'success'
