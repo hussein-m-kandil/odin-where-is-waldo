@@ -68,12 +68,16 @@ export class Game implements OnDestroy {
       this.loading.set(true);
       this._finders
         .createFinder()
-        .pipe(finalize(() => setTimeout(() => this.loading.set(false), 1000)))
+        .pipe(finalize(() => this.loading.set(false)))
         .subscribe({
           next: (finder) => this.finder.set(finder),
           error: () => this.notifier.notify({ message: 'Failed to start!', type: 'error' }),
         });
     }
+  }
+
+  protected escape() {
+    if (!this.loading()) this.finder.set(null);
   }
 
   protected selectCharacter(e: MouseEvent) {
@@ -97,7 +101,7 @@ export class Game implements OnDestroy {
         this.loading.set(true);
         this.characterSelection
           .evaluate(name, selectedPoint, finder.id)
-          .pipe(finalize(() => setTimeout(() => this.loading.set(false), 1000)))
+          .pipe(finalize(() => this.loading.set(false)))
           .subscribe({
             next: (evaluationResult) => {
               const { evaluation } = evaluationResult;

@@ -4,15 +4,15 @@ import {
   EvaluationResult,
 } from './characters/character-selection/character-selection.types';
 import { CharacterSelection } from './characters/character-selection/character-selection';
-import { render, screen, waitForElementToBeRemoved } from '@testing-library/angular';
+import { of, delay, throwError, observeOn, asyncScheduler } from 'rxjs';
 import { provideZonelessChangeDetection, signal } from '@angular/core';
 import { afterEach, describe, expect, it, Mock, vi } from 'vitest';
+import { render, screen } from '@testing-library/angular';
 import { userEvent } from '@testing-library/user-event';
 import { allFinders, finder } from '../../test/utils';
 import { Characters } from './characters/characters';
 import { HttpResponse } from '@angular/common/http';
 import { Finders } from './finders/finders';
-import { of, throwError } from 'rxjs';
 import { Game } from './game';
 
 const characters = new Characters();
@@ -73,9 +73,7 @@ describe('Game', () => {
   });
 
   it('should render the starting button, while loading start data', async () => {
-    finders.createFinder.mockImplementationOnce(() =>
-      throwError(() => new HttpResponse({ status: 500, statusText: 'internal server error' }))
-    );
+    finders.createFinder.mockImplementationOnce(() => of(finder).pipe(delay(1000)));
     const user = userEvent.setup();
     await renderComponent();
     await user.click(screen.getByRole('button', { name: /start/i }));
@@ -84,14 +82,27 @@ describe('Game', () => {
   });
 
   it('should re-render the start button again, if failed to start', async () => {
+    vi.useFakeTimers();
+    const delay = 1000;
     finders.createFinder.mockImplementationOnce(() =>
-      throwError(() => new HttpResponse({ status: 500, statusText: 'internal server error' }))
+      throwError(() => new HttpResponse({ status: 500, statusText: 'internal server error' })).pipe(
+        observeOn(asyncScheduler, delay)
+      )
     );
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    await renderComponent();
+    await user.click(screen.getByRole('button', { name: /start/i }));
+    expect(screen.getByRole('button', { name: /starting/i })).toBeVisible();
+    await vi.runAllTimersAsync();
+    expect(screen.getByRole('button', { name: /start(?!ing)/i })).toBeVisible();
+    vi.useRealTimers();
+  });
+
+  it('should render the escape button after starting', async () => {
     const user = userEvent.setup();
     await renderComponent();
     await user.click(screen.getByRole('button', { name: /start/i }));
-    await waitForElementToBeRemoved(() => screen.getByRole('button', { name: /starting/i }));
-    expect(await screen.findByRole('button', { name: /start(?!ing)/i })).toBeVisible();
+    expect(await screen.findByRole('button', { name: /escape/i })).toBeVisible();
   });
 
   it('should render the crowded image where we can find Waldo, after successful start', async () => {

@@ -1,3 +1,4 @@
+@let finderCreated = !!finder(); @let _loading = loading();
 <div class="text-center border-1 border-t-0 *:border-t-1 *:border-black">
   <div class="flex justify-center p-2 pb-0">
     @for (character of characters.data; track character.name) {
@@ -7,27 +8,27 @@
     }
   </div>
   @let _notification = notifier.notification;
-  <p
-    class="p-2 font-bold"
+  <div
+    class="p-4 space-y-2 bg-black text-white font-bold"
     [class]="{
-      'text-red-700': _notification.type === 'error',
-      'text-green-700': _notification.type === 'success'
+      'bg-red-700': _notification.type === 'error',
+      'bg-green-700': _notification.type === 'success'
     }"
   >
-    {{ _notification.message || 'Please, help us find Waldo and his friends, ASAP!' }}
-  </p>
-  @if (!finder()) {
-  <button
-    type="button"
-    (click)="start()"
-    [disabled]="loading()"
-    [class]="`py-2 px-4 rounded-2xl min-w-32 shadow-sm font-bold border-1 mb-4
-      disabled:text-gray-500 active:not-disabled:bg-gray-100 hover:not-disabled:shadow-md`"
-  >
-    {{`Start${loading() ? 'ing...' : '' }`}}
-  </button>
-  <app-finder-list class="border-t-1" />
-  } @else {
+    <p>
+      {{ _notification.message || 'Please, help us find Waldo and his friends, ASAP!' }}
+    </p>
+    <button
+      type="button"
+      [disabled]="_loading"
+      (click)="finderCreated ? escape() : start()"
+      [class]="`text-sm py-1 px-2 min-w-24 shadow-sm border-1 rounded-lg cursor-pointer 
+        disabled:text-gray-300 disabled:border-gray-300 active:not-disabled:bg-gray-500`"
+    >
+      @if(finderCreated){Escape}@else{Start@if(_loading){ing...}}
+    </button>
+  </div>
+  @if (finderCreated) {
   <app-stats
     class="border-t-1"
     [foundCharacters]="characterSelection.getFoundCharacters().length"
@@ -40,10 +41,10 @@
       <button
         type="button"
         aria-label="Select a character"
-        [class]="{ 'saturate-50': loading() }"
+        [class]="{ 'saturate-25': _loading }"
         [class]="`focus-visible:outline-none focus-visible:inset-ring-2 inset-ring-black/20
           absolute top-0 left-0 right-0 bottom-0`"
-        (click)="!loading() && selectCharacter($event)"
+        (click)="!_loading && selectCharacter($event)"
       >
         <img
           fill
@@ -54,8 +55,8 @@
           class="absolute top-0 left-0 right-0 bottom-0 -z-10"
         />
       </button>
-      @if (loading()) {
-      <span class="absolute top-0 left-0 right-0 bottom-0 bg-white/50 animate-pulse"></span>
+      @if (_loading) {
+      <span class="absolute top-0 left-0 right-0 bottom-0 bg-white/75 animate-pulse"></span>
       }
     </div>
     @if (characterSelection.selectedPoint && characterSelection.imageElement) {
@@ -66,5 +67,7 @@
     />
     }
   </div>
+  } @else {
+  <app-finder-list class="border-t-1" />
   }
 </div>
