@@ -2,7 +2,12 @@
 <!-- prettier-ignore -->
 @let _loading = loading();
 @let foundCharacters = characterSelection.getFoundCharacters();
-<div class="text-center border-1 border-t-0 *:border-t-1 *:border-black">
+<div
+  aria-atomic="false"
+  aria-relevant="all"
+  aria-live="assertive"
+  class="text-center border-1 border-t-0 *:border-t-1 *:border-black"
+>
   <div class="flex justify-center pt-2">
     @for (character of characters.data; track character.name) {
     <!-- prettier-ignore -->
@@ -11,8 +16,8 @@
     <img
       [width]="size"
       [height]="size"
-      [alt]="character.image.alt"
       [ngSrc]="character.image.src"
+      [alt]="`${character.image.alt} (${found ? '' : 'not'} found)`"
       [class]="found ? '' : 'saturate-70 opacity-70'"
     />
     }
@@ -25,9 +30,7 @@
       'bg-green-700': _notification.type === 'success'
     }"
   >
-    <p>
-      {{ _notification.message || 'Please help us find Waldo and his friends.' }}
-    </p>
+    <p>{{ _notification.message || 'Please help us find Waldo and his friends.' }}</p>
     <button
       type="button"
       (click)="finderCreated ? escape() : start()"
@@ -50,10 +53,9 @@
       </div>
       <button
         type="button"
-        aria-label="Select a character"
         [class]="{ 'saturate-25': _loading }"
         [class]="`focus-visible:outline-none focus-visible:inset-ring-2 inset-ring-black/20
-          absolute top-0 left-0 right-0 bottom-0`"
+        absolute top-0 left-0 right-0 bottom-0`"
         (click)="!_loading && selectCharacter($event)"
       >
         <img
@@ -61,7 +63,7 @@
           #crowd
           priority
           ngSrc="/where-is-waldo-winter.jpg"
-          alt="A crowded illustration shows Waldo and his friends skiing on an icy mountain."
+          alt="An illustration of a crowd of people skiing on an icy mountain, where you can find Waldo and his friends."
           class="absolute top-0 left-0 right-0 bottom-0 -z-10"
         />
       </button>

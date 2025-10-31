@@ -67,7 +67,7 @@ describe('Game', () => {
   it('should render faded images of Waldo and his friends', async () => {
     await renderComponent();
     for (const character of characters.data) {
-      const img = screen.getByRole('img', { name: character.image.alt });
+      const img = screen.getByRole('img', { name: new RegExp(character.image.alt, 'i') });
       expect(img).toBeVisible();
       expect(img).toHaveClass(/opacity-\d{1,2}/i, /saturate-\d{1,2}/i);
     }
@@ -78,7 +78,7 @@ describe('Game', () => {
     characterSelection.getFoundCharacters.mockImplementation(() => foundCharacters);
     await renderComponent();
     for (const character of characters.data) {
-      const img = screen.getByRole('img', { name: character.image.alt });
+      const img = screen.getByRole('img', { name: new RegExp(character.image.alt, 'i') });
       expect(img).toBeVisible();
       if (foundCharacters.includes(character.name)) {
         expect(img).not.toHaveClass(/opacity-\d{1,2}/i, /saturate-\d{1,2}/i);
@@ -137,63 +137,49 @@ describe('Game', () => {
   });
 
   it('should render the crowded image where we can find Waldo, after successful start', async () => {
-    vi.useFakeTimers();
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const user = userEvent.setup();
     await renderComponent();
     await user.click(screen.getByRole('button', { name: /start/i }));
-    vi.advanceTimersToNextTimer();
-    expect(await screen.findByRole('img', { name: /crowded .* waldo/i })).toBeVisible();
-    vi.useRealTimers();
+    expect(await screen.findByRole('img', { name: /crowd.* waldo/i })).toBeVisible();
   });
 
   it('should add character selection when the crowded image is clicked', async () => {
-    vi.useFakeTimers();
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const user = userEvent.setup();
     await renderComponent();
     await user.click(screen.getByRole('button', { name: /start/i }));
-    vi.advanceTimersToNextTimer();
-    await user.click(await screen.findByRole('img', { name: /crowded .* waldo/i }));
+    await user.click(await screen.findByRole('img', { name: /crowd.* waldo/i }));
     expect(characterSelection.select).toHaveBeenCalledOnce();
     expect(characterSelection.deselect).not.toHaveBeenCalled();
-    vi.useRealTimers();
   });
 
   it('should add character selection when the crowded image wrapper button is clicked', async () => {
-    vi.useFakeTimers();
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const user = userEvent.setup();
     await renderComponent();
     await user.click(screen.getByRole('button', { name: /start/i }));
-    vi.advanceTimersToNextTimer();
-    await user.click(await screen.findByRole('button', { name: /select.* character/i }));
+    await user.click(await screen.findByRole('button', { name: /crowd.* waldo/i }));
     expect(characterSelection.select).toHaveBeenCalledOnce();
     expect(characterSelection.deselect).not.toHaveBeenCalled();
-    vi.useRealTimers();
   });
 
   it('should add character selection when `Enter` pressed while focusing the crowded image wrapper button', async () => {
-    vi.useFakeTimers();
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const user = userEvent.setup();
     await renderComponent();
     await user.click(screen.getByRole('button', { name: /start/i }));
-    vi.advanceTimersToNextTimer();
-    await user.click(await screen.findByRole('button', { name: /select.* character/i }));
+    await user.click(await screen.findByRole('button', { name: /crowd.* waldo/i }));
     await user.keyboard('{Enter}');
     expect(characterSelection.select).toHaveBeenCalledTimes(2);
     expect(characterSelection.deselect).not.toHaveBeenCalled();
-    vi.useRealTimers();
   });
 
   it('should remove character selection on a click that occurs outside the crowded image', async () => {
-    vi.useFakeTimers();
-    let user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    let user = userEvent.setup();
     await renderComponent();
     await user.click(screen.getByRole('button', { name: /start/i }));
     // For unknown reason I needed to setup user event again, otherwise the pointer event won't fire,
     // and using `fireEvent.click(documentElement, { x, y, clientX, clientY })` is another workaround
-    user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
-    vi.advanceTimersToNextTimer();
+    user = userEvent.setup();
     const crowd = (await screen.findByRole('img', {
-      name: /crowded .* waldo/i,
+      name: /crowd.* waldo/i,
     })) as HTMLImageElement;
     const { top, left, right, bottom } = crowd.getBoundingClientRect();
     const pointsOutsideCrowd = [
@@ -211,57 +197,46 @@ describe('Game', () => {
     }
     expect(characterSelection.select).not.toHaveBeenCalled();
     expect(characterSelection.deselect).toHaveBeenCalledTimes(pointsOutsideCrowd.length);
-    vi.useRealTimers();
   });
 
   it('should remove character selection when `Escape` is pressed', async () => {
-    vi.useFakeTimers();
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const user = userEvent.setup();
     await renderComponent();
     await user.click(screen.getByRole('button', { name: /start/i }));
-    vi.advanceTimersToNextTimer();
-    await user.click(await screen.findByRole('img', { name: /crowded .* waldo/i }));
+    await user.click(await screen.findByRole('img', { name: /crowd.* waldo/i }));
     characterSelection.deselect.mockClear();
     await user.keyboard('{Escape}');
     expect(characterSelection.deselect).toHaveBeenCalledTimes(1);
-    vi.useRealTimers();
   });
 
   it('should evaluate the selected character, then remove the character selection', async () => {
-    vi.useFakeTimers();
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const user = userEvent.setup();
     await renderComponent();
     await user.click(screen.getByRole('button', { name: /start/i }));
     for (const character of characters.data) {
-      vi.advanceTimersToNextTimer();
-      await user.click(await screen.findByRole('img', { name: /crowded .* waldo/i }));
+      await user.click(await screen.findByRole('img', { name: /crowd.* waldo/i }));
       await user.click(
         await screen.findByRole('button', { name: new RegExp(`select.* ${character.name}`, 'i') })
       );
     }
     expect(characterSelection.evaluate).toHaveBeenCalledTimes(characters.data.length);
     expect(characterSelection.deselect).toHaveBeenCalledTimes(characters.data.length);
-    vi.useRealTimers();
   });
 
   it('should display a notification about evaluation result', async () => {
-    vi.useFakeTimers();
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const user = userEvent.setup();
     await renderComponent();
     await user.click(screen.getByRole('button', { name: /start/i }));
     for (const { name } of characters.data) {
-      vi.advanceTimersToNextTimer();
       const succeeded = Math.random() > 0.5;
       characterSelection.evaluate.mockImplementationOnce(() =>
         of({ evaluation: { [name]: succeeded }, finder })
       );
-      await user.click(await screen.findByRole('img', { name: /crowded .* waldo/i }));
+      await user.click(await screen.findByRole('img', { name: /crowd.* waldo/i }));
       const characterBtnRegex = new RegExp(`select.* ${name}`, 'i');
       await user.click(await screen.findByRole('button', { name: characterBtnRegex }));
-      vi.advanceTimersToNextTimer();
       const notificationRegex = new RegExp(`${succeeded ? 'Yes' : 'No'},? .*${name}`, 'i');
       expect(await screen.findByText(notificationRegex)).toBeVisible();
     }
-    vi.useRealTimers();
   });
 });
