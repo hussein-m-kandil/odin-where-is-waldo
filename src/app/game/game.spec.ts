@@ -6,21 +6,17 @@ import {
 import { CharacterSelection } from './characters/character-selection/character-selection';
 import { of, delay, throwError, observeOn, asyncScheduler } from 'rxjs';
 import { provideZonelessChangeDetection, signal } from '@angular/core';
-import { afterEach, describe, expect, it, Mock, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/angular';
 import { userEvent } from '@testing-library/user-event';
-import { allFinders, finder } from '../../test/utils';
 import { Characters } from './characters/characters';
+import { findersMock } from './finders/finders.mock';
 import { HttpResponse } from '@angular/common/http';
 import { Finders } from './finders/finders';
+import { finder } from '../../test/utils';
 import { Game } from './game';
 
 const characters = new Characters();
-
-const finders: Record<keyof Omit<Finders, '_http'>, Mock> = {
-  getAllFinders: vi.fn(() => of(allFinders)),
-  createFinder: vi.fn(() => of(finder)),
-};
 
 class CharacterSelectionMock {
   private _imageElement: HTMLImageElement | null = null;
@@ -56,7 +52,7 @@ const renderComponent = () => {
     providers: [
       provideZonelessChangeDetection(),
       { provide: CharacterSelection, useValue: characterSelection },
-      { provide: Finders, useValue: finders },
+      { provide: Finders, useValue: findersMock },
     ],
   });
 };
@@ -95,7 +91,7 @@ describe('Game', () => {
   });
 
   it('should render the starting button, while loading start data', async () => {
-    finders.createFinder.mockImplementationOnce(() => of(finder).pipe(delay(1000)));
+    findersMock.createFinder.mockImplementationOnce(() => of(finder).pipe(delay(1000)));
     const user = userEvent.setup();
     await renderComponent();
     await user.click(screen.getByRole('button', { name: /start/i }));
@@ -106,7 +102,7 @@ describe('Game', () => {
   it('should re-render the start button again, if failed to start', async () => {
     vi.useFakeTimers();
     const delay = 1000;
-    finders.createFinder.mockImplementationOnce(() =>
+    findersMock.createFinder.mockImplementationOnce(() =>
       throwError(() => new HttpResponse({ status: 500, statusText: 'internal server error' })).pipe(
         observeOn(asyncScheduler, delay)
       )

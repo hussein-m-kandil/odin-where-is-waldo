@@ -2,18 +2,14 @@ import { render, screen, RenderComponentOptions } from '@testing-library/angular
 import { HttpErrorResponse, provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
-import { allFinders, finder } from '../../../../test/utils';
-import { afterEach, describe, expect, it, Mock, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { userEvent } from '@testing-library/user-event';
+import { allFinders } from '../../../../test/utils';
+import { findersMock } from '../finders.mock';
 import { of, delay, throwError } from 'rxjs';
 import { FinderList } from './finder-list';
-import { Finders } from '../finders';
 import { Finder } from '../finders.types';
-
-const finders: Record<keyof Omit<Finders, '_http'>, Mock> = {
-  getAllFinders: vi.fn(() => of(allFinders)),
-  createFinder: vi.fn(() => of(finder)),
-};
+import { Finders } from '../finders';
 
 const renderComponent = ({
   providers,
@@ -24,7 +20,7 @@ const renderComponent = ({
       provideHttpClient(),
       provideHttpClientTesting(),
       provideZonelessChangeDetection(),
-      { provide: Finders, useValue: finders },
+      { provide: Finders, useValue: findersMock },
       ...(providers || []),
     ],
     ...restOptions,
@@ -73,14 +69,14 @@ describe('FinderList', () => {
   });
 
   it('should render loading indicator', async () => {
-    finders.getAllFinders.mockImplementationOnce(() => of(allFinders).pipe(delay(1000)));
+    findersMock.getAllFinders.mockImplementationOnce(() => of(allFinders).pipe(delay(1000)));
     await renderComponent();
     expect(screen.getByText(/loading/i)).toBeVisible();
   });
 
   it('should remove loading indicator when finish', async () => {
     vi.useFakeTimers();
-    finders.getAllFinders.mockImplementationOnce(() => of(allFinders).pipe(delay(100)));
+    findersMock.getAllFinders.mockImplementationOnce(() => of(allFinders).pipe(delay(100)));
     await renderComponent();
     await vi.advanceTimersByTimeAsync(100);
     await vi.runOnlyPendingTimersAsync();
@@ -89,7 +85,7 @@ describe('FinderList', () => {
   });
 
   it('should render an error message and try a try-again button', async () => {
-    finders.getAllFinders.mockImplementationOnce(() =>
+    findersMock.getAllFinders.mockImplementationOnce(() =>
       throwError(() => new HttpErrorResponse({ status: 500, statusText: 'internal server error' }))
     );
     await renderComponent();
@@ -98,17 +94,17 @@ describe('FinderList', () => {
   });
 
   it('should retry loading finders again after clicking the try-again button', async () => {
-    finders.getAllFinders.mockImplementationOnce(() =>
+    findersMock.getAllFinders.mockImplementationOnce(() =>
       throwError(() => new HttpErrorResponse({ status: 500, statusText: 'internal server error' }))
     );
     const user = userEvent.setup();
     await renderComponent();
     await user.click(screen.getByRole('button', { name: /try again/i }));
-    expect(finders.getAllFinders).toHaveBeenCalledTimes(2);
+    expect(findersMock.getAllFinders).toHaveBeenCalledTimes(2);
   });
 
   it('should remove the try-again button after a successful retry', async () => {
-    finders.getAllFinders.mockImplementationOnce(() =>
+    findersMock.getAllFinders.mockImplementationOnce(() =>
       throwError(() => new HttpErrorResponse({ status: 500, statusText: 'internal server error' }))
     );
     const user = userEvent.setup();
@@ -131,7 +127,7 @@ describe('FinderList', () => {
       { id: genId(), createdAt, updatedAt, name: 'Tar', duration: 24 * 60 * 60 },
       { id: genId(), createdAt, updatedAt, name: 'Tar', duration: 3 * 24 * 60 * 60 },
     ];
-    finders.getAllFinders.mockImplementationOnce(() => of(finderList));
+    findersMock.getAllFinders.mockImplementationOnce(() => of(finderList));
     await renderComponent();
     expect(screen.getByRole('table', { name: /finders/i })).toBeVisible();
     expect(screen.getAllByRole('columnheader')).toHaveLength(2);
