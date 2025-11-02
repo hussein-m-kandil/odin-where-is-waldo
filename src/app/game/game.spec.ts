@@ -129,6 +129,8 @@ describe('Game', () => {
     await user.click(screen.getByRole('button', { name: /start/i }));
     await user.click(await screen.findByRole('button', { name: /escape/i }));
     expect(await screen.findByRole('button', { name: /start/i })).toBeVisible();
+    expect(screen.queryByRole('img', { name: /crowd.* waldo/i })).toBeNull();
+    expect(screen.getByRole('table', { name: /finders/i })).toBeVisible();
     expect(characterSelection.reset).toHaveBeenCalledOnce();
   });
 
@@ -234,5 +236,62 @@ describe('Game', () => {
       const notificationRegex = new RegExp(`${succeeded ? 'Yes' : 'No'},? .*${name}`, 'i');
       expect(await screen.findByText(notificationRegex)).toBeVisible();
     }
+  });
+
+  it('should prevent any further character selections when the game is over', async () => {
+    characterSelection.getFoundCharacters.mockImplementationOnce(() =>
+      characters.data.map((c) => c.name)
+    );
+    const user = userEvent.setup();
+    await renderComponent();
+    await user.click(screen.getByRole('button', { name: /start/i }));
+    for (const { name } of characters.data) {
+      await user.click(await screen.findByRole('img', { name: /crowd.* waldo/i }));
+      const characterBtnRegex = new RegExp(`select.* ${name}`, 'i');
+      expect(() => screen.findByRole('button', { name: characterBtnRegex })).rejects.toThrowError();
+    }
+  });
+
+  it('should prevent escaping when the game is over', async () => {
+    characterSelection.getFoundCharacters.mockImplementationOnce(() =>
+      characters.data.map((c) => c.name)
+    );
+    const user = userEvent.setup();
+    await renderComponent();
+    await user.click(screen.getByRole('button', { name: /start/i }));
+    await user.click(await screen.findByRole('button', { name: /escape/i }));
+    expect(() => screen.findByRole('button', { name: /start/i })).rejects.toThrowError();
+    expect(screen.getByRole('img', { name: /crowd.* waldo/i })).toBeVisible();
+    expect(screen.getByRole('button', { name: /escape/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /escape/i })).toBeVisible();
+    expect(screen.queryByRole('table', { name: /finders/i })).toBeNull();
+    expect(characterSelection.reset).not.toHaveBeenCalled();
+  });
+
+  it('should display the finder form when the game is over', async () => {
+    characterSelection.getFoundCharacters.mockImplementationOnce(() =>
+      characters.data.map((c) => c.name)
+    );
+    const user = userEvent.setup();
+    await renderComponent();
+    await user.click(screen.getByRole('button', { name: /start/i }));
+    expect(screen.getByRole('form', { name: /finder/i })).toBeVisible();
+    expect(screen.getByRole('textbox', { name: /name/i })).toBeVisible();
+    expect(screen.getByRole('button', { name: /(submit)|(save)/i })).toBeVisible();
+  });
+
+  it('should reset the game after submitting the finder form successfully', async () => {
+    characterSelection.getFoundCharacters.mockImplementationOnce(() =>
+      characters.data.map((c) => c.name)
+    );
+    const user = userEvent.setup();
+    await renderComponent();
+    await user.click(screen.getByRole('button', { name: /start/i }));
+    await user.type(screen.getByRole('textbox', { name: /name/i }), 'x');
+    await user.click(screen.getByRole('button', { name: /(submit)|(save)/i }));
+    expect(await screen.findByRole('button', { name: /start/i })).toBeVisible();
+    expect(screen.queryByRole('img', { name: /crowd.* waldo/i })).toBeNull();
+    expect(screen.getByRole('table', { name: /finders/i })).toBeVisible();
+    expect(characterSelection.reset).toHaveBeenCalledOnce();
   });
 });

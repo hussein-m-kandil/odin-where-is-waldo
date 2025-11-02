@@ -6,10 +6,12 @@ import {
   viewChild,
   ElementRef,
   afterNextRender,
+  computed,
 } from '@angular/core';
 import { CharacterMenu } from './characters/character-selection/character-menu/character-menu';
 import { CharacterSelection } from './characters/character-selection/character-selection';
 import { FinderList } from './finders/finder-list/finder-list';
+import { FinderForm } from './finders/finder-form/finder-form';
 import { Character } from './characters/characters.types';
 import { Characters } from './characters/characters';
 import { NgOptimizedImage } from '@angular/common';
@@ -21,13 +23,17 @@ import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-game',
-  imports: [NgOptimizedImage, CharacterMenu, FinderList, Stats],
+  imports: [NgOptimizedImage, CharacterMenu, FinderList, FinderForm, Stats],
   templateUrl: './game.html',
 })
 export class Game implements OnDestroy {
   private readonly _crowdedImage = viewChild<ElementRef<HTMLImageElement>>('crowd');
 
-  protected readonly characters = inject(Characters);
+  protected readonly _characters = inject(Characters);
+  protected get characters() {
+    return this._characters.data;
+  }
+
   protected readonly notifier = inject(Notifier);
   private readonly _finders = inject(Finders);
 
@@ -48,6 +54,14 @@ export class Game implements OnDestroy {
       }
     }
   };
+
+  protected readonly foundCharacters = computed(() => this.characterSelection.getFoundCharacters());
+  protected readonly gameOver = computed<boolean>(
+    () => this.foundCharacters().length >= this.characters.length
+  );
+  protected readonly playable = computed(() =>
+    Boolean(this.finder() && !this.loading() && !this.gameOver())
+  );
 
   constructor() {
     afterNextRender({
@@ -76,16 +90,18 @@ export class Game implements OnDestroy {
     }
   }
 
+  protected reset() {
+    this.finder.set(null);
+    this.characterSelection.reset();
+    this.notifier.notify(this.notifier.defaultNotification, 0);
+  }
+
   protected escape() {
-    if (!this.loading()) {
-      this.finder.set(null);
-      this.characterSelection.reset();
-      this.notifier.notify(this.notifier.defaultNotification, 0);
-    }
+    if (this.playable()) this.reset();
   }
 
   protected selectCharacter(e: MouseEvent) {
-    if (!this.loading()) {
+    if (this.playable()) {
       const imageElement = this._crowdedImage()?.nativeElement;
       if (imageElement) {
         // Stop propagation to prevent removing the selection under any circumstances,
@@ -98,7 +114,7 @@ export class Game implements OnDestroy {
   }
 
   protected evaluateSelectedCharacter(name: Character['name']) {
-    if (!this.loading()) {
+    if (this.playable()) {
       const selectedPoint = this.characterSelection.selectedPoint?.natural;
       const finder = this.finder();
       if (selectedPoint && finder && finder.id) {

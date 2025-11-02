@@ -1,7 +1,6 @@
-@let finderCreated = !!finder();
+@let _finder = finder();
 <!-- prettier-ignore -->
 @let _loading = loading();
-@let foundCharacters = characterSelection.getFoundCharacters();
 <div
   aria-atomic="false"
   aria-relevant="all"
@@ -9,10 +8,10 @@
   class="text-center border-1 border-t-0 *:border-t-1 *:border-black"
 >
   <div class="flex justify-center pt-2">
-    @for (character of characters.data; track character.name) {
+    @for (character of characters; track character.name) {
     <!-- prettier-ignore -->
     @let size = 45;
-    @let found = foundCharacters.includes(character.name);
+    @let found = foundCharacters().includes(character.name);
     <img
       [width]="size"
       [height]="size"
@@ -33,15 +32,15 @@
     <p>{{ _notification.message || 'Please help us find Waldo and his friends.' }}</p>
     <button
       type="button"
-      (click)="finderCreated ? escape() : start()"
-      [disabled]="_loading || _notification.type !== 'normal'"
+      (click)="_finder ? escape() : start()"
+      [disabled]="_loading || _notification.type !== 'normal' || (_finder && gameOver())"
       [class]="`text-sm py-1 px-2 min-w-24 shadow-sm border-1 rounded-lg cursor-pointer 
         disabled:text-gray-300 disabled:border-gray-300 active:not-disabled:bg-gray-500`"
     >
-      @if(finderCreated){Escape}@else{Start@if(_loading){ing...}}
+      @if(_finder){Escape}@else{Start@if(_loading){ing...}}
     </button>
   </div>
-  @if (finderCreated) {
+  @if (_finder) {
   <app-stats
     class="border-t-1"
     [foundCharacters]="characterSelection.getFoundCharacters().length"
@@ -69,6 +68,20 @@
       </button>
       @if (_loading) {
       <span class="absolute top-0 left-0 right-0 bottom-0 bg-white/75 animate-pulse"></span>
+      }
+      <!-- prettier-ignore -->
+      @if (gameOver()) {
+      <div
+        class="{{`absolute top-0 left-0 right-0 bottom-0 z-10
+        bg-black/75 backdrop-saturate-25 backdrop-blur-xs`}}"
+      >
+        <app-finder-form
+          [finder]="_finder"
+          (submitted)="reset()"
+          class="{{`absolute top-1/2 left-1/2 -translate-1/2 w-full max-w-2xs
+            bg-white py-6 px-4 rounded-2xl`}}"
+        />
+      </div>
       }
     </div>
     @if (characterSelection.selectedPoint && characterSelection.imageElement) {
