@@ -1,7 +1,7 @@
 import { environment } from '../../../environments/environment';
+import { Finder, NewFinder } from '../finders/finders.types';
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Finder } from '../finders/finders.types';
 
 const baseUrl = `${environment.baseUrl}/finders`;
 
@@ -17,5 +17,9 @@ export class Finders {
 
   createFinder() {
     return this._http.post<Finder>(baseUrl, {});
+  }
+
+  updateFinder(id: Finder['id'], data: NewFinder) {
+    return this._http.patch<Finder>(`${baseUrl}/${id}`, data);
   }
 }

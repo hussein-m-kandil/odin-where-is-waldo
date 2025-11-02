@@ -5,3 +5,5 @@ export interface Finder {
   updatedAt: string;
   duration: number | null;
 }
+
+export type NewFinder = Pick<Finder, 'name'>;

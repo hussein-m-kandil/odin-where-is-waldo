@@ -6,4 +6,5 @@ import { of } from 'rxjs';
 export const findersMock: Record<keyof Omit<Finders, '_http'>, Mock> = {
   getAllFinders: vi.fn(() => of(allFinders)),
   createFinder: vi.fn(() => of(finder)),
+  updateFinder: vi.fn(() => of(finder)),
 };

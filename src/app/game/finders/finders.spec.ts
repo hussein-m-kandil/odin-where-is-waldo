@@ -82,4 +82,39 @@ describe('Finders', () => {
     expect(resData).toBeUndefined();
     httpTesting.verify();
   });
+
+  it('should update a finder', () => {
+    const { service, httpTesting } = setup();
+    const updatedFinder = { ...finder, name: 'Tester' };
+    const finder$ = service.updateFinder(updatedFinder.id, { name: updatedFinder.name });
+    let resData: unknown;
+    let resError: unknown;
+    finder$.subscribe({ next: (d) => (resData = d), error: (e) => (resError = e) });
+    const req = httpTesting.expectOne(
+      { method: 'PATCH', url: `${baseUrl}/finders/${updatedFinder.id}` },
+      'Request to update a finder'
+    );
+    req.flush(updatedFinder, { status: 200, statusText: 'Patched' });
+    expect(resData).toStrictEqual(updatedFinder);
+    expect(resError).toBeUndefined();
+    httpTesting.verify();
+  });
+
+  it('should fail to update a finder', () => {
+    const { service, httpTesting } = setup();
+    const finder$ = service.updateFinder(finder.id, { name: 'Wrong' });
+    let resData: unknown;
+    let resError: unknown;
+    finder$.subscribe({ next: (d) => (resData = d), error: (e) => (resError = e) });
+    const req = httpTesting.expectOne(
+      { method: 'PATCH', url: `${baseUrl}/finders/${finder.id}` },
+      'Request to update a finder'
+    );
+    const error = { message: 'invalid name' };
+    req.flush(error, { status: 400, statusText: 'bad request' });
+    expect(resError).toBeInstanceOf(HttpErrorResponse);
+    expect(resError).toHaveProperty('error', error);
+    expect(resData).toBeUndefined();
+    httpTesting.verify();
+  });
 });
