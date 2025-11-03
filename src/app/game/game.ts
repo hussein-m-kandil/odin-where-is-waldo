@@ -1,12 +1,12 @@
 import {
   inject,
   signal,
+  computed,
   Component,
   OnDestroy,
   viewChild,
   ElementRef,
   afterNextRender,
-  computed,
 } from '@angular/core';
 import { CharacterMenu } from './characters/character-selection/character-menu/character-menu';
 import { CharacterSelection } from './characters/character-selection/character-selection';
@@ -18,6 +18,7 @@ import { NgOptimizedImage } from '@angular/common';
 import { Finder } from './finders/finders.types';
 import { Notifier } from './notifier/notifier';
 import { Finders } from './finders/finders';
+import { Sounds } from './sounds/sounds';
 import { Stats } from './stats/stats';
 import { finalize } from 'rxjs';
 
@@ -36,6 +37,7 @@ export class Game implements OnDestroy {
 
   protected readonly notifier = inject(Notifier);
   private readonly _finders = inject(Finders);
+  private readonly _sounds = inject(Sounds);
 
   protected readonly finder = signal<Finder | null>(null);
   protected readonly loading = signal(false);
@@ -84,7 +86,10 @@ export class Game implements OnDestroy {
         .createFinder()
         .pipe(finalize(() => this.loading.set(false)))
         .subscribe({
-          next: (finder) => this.finder.set(finder),
+          next: (finder) => {
+            this.finder.set(finder);
+            this._sounds.start();
+          },
           error: () => this.notifier.notify({ message: 'Failed to start!', type: 'error' }),
         });
     }
@@ -97,7 +102,10 @@ export class Game implements OnDestroy {
   }
 
   protected escape() {
-    if (this.playable()) this.reset();
+    if (this.playable()) {
+      this.reset();
+      this._sounds.escape();
+    }
   }
 
   protected selectCharacter(e: MouseEvent) {
@@ -131,11 +139,14 @@ export class Game implements OnDestroy {
                   : `${name[0].toUpperCase()}${name.slice(1).toLowerCase()}`;
               if (evaluation[name]) {
                 this.notifier.notify({ message: `Yes, this is ${displayName}!`, type: 'success' });
-              } else
+                this._sounds[this.gameOver() ? 'end' : 'win']();
+              } else {
                 this.notifier.notify({
                   message: `No, this is not ${displayName}!`,
                   type: 'error',
                 });
+                this._sounds.lose();
+              }
             },
             error: () =>
               this.notifier.notify({

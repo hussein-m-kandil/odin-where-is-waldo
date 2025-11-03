@@ -14,9 +14,18 @@ import { findersMock } from './finders/finders.mock';
 import { HttpResponse } from '@angular/common/http';
 import { Finders } from './finders/finders';
 import { finder } from '../../test/utils';
+import { Sounds } from './sounds/sounds';
 import { Game } from './game';
 
 const characters = new Characters();
+
+const soundsMock = {
+  escape: vi.fn(),
+  start: vi.fn(),
+  lose: vi.fn(),
+  win: vi.fn(),
+  end: vi.fn(),
+};
 
 class CharacterSelectionMock {
   private _imageElement: HTMLImageElement | null = null;
@@ -53,6 +62,7 @@ const renderComponent = () => {
       provideZonelessChangeDetection(),
       { provide: CharacterSelection, useValue: characterSelection },
       { provide: Finders, useValue: findersMock },
+      { provide: Sounds, useValue: soundsMock },
     ],
   });
 };
@@ -123,7 +133,7 @@ describe('Game', () => {
     expect(await screen.findByRole('button', { name: /escape/i })).toBeVisible();
   });
 
-  it('should reset game state on escape button clicked', async () => {
+  it('should reset game state on escape button clicked, and play the corresponding sound', async () => {
     const user = userEvent.setup();
     await renderComponent();
     await user.click(screen.getByRole('button', { name: /start/i }));
@@ -132,13 +142,15 @@ describe('Game', () => {
     expect(screen.queryByRole('img', { name: /crowd.* waldo/i })).toBeNull();
     expect(screen.getByRole('table', { name: /finders/i })).toBeVisible();
     expect(characterSelection.reset).toHaveBeenCalledOnce();
+    expect(soundsMock.escape).toHaveBeenCalledOnce();
   });
 
-  it('should render the crowded image where we can find Waldo, after successful start', async () => {
+  it('should render the crowded image where we can find Waldo, and play the corresponding sound, on start', async () => {
     const user = userEvent.setup();
     await renderComponent();
     await user.click(screen.getByRole('button', { name: /start/i }));
     expect(await screen.findByRole('img', { name: /crowd.* waldo/i })).toBeVisible();
+    expect(soundsMock.start).toHaveBeenCalledOnce();
   });
 
   it('should add character selection when the crowded image is clicked', async () => {
@@ -221,11 +233,12 @@ describe('Game', () => {
     expect(characterSelection.deselect).toHaveBeenCalledTimes(characters.data.length);
   });
 
-  it('should display a notification about evaluation result', async () => {
+  it('should display a notification about evaluation result, and play the corresponding sound', async () => {
     const user = userEvent.setup();
     await renderComponent();
     await user.click(screen.getByRole('button', { name: /start/i }));
     for (const { name } of characters.data) {
+      vi.clearAllMocks(); // Needed for checking the sounds methods
       const succeeded = Math.random() > 0.5;
       characterSelection.evaluate.mockImplementationOnce(() =>
         of({ evaluation: { [name]: succeeded }, finder })
@@ -233,9 +246,34 @@ describe('Game', () => {
       await user.click(await screen.findByRole('img', { name: /crowd.* waldo/i }));
       const characterBtnRegex = new RegExp(`select.* ${name}`, 'i');
       await user.click(await screen.findByRole('button', { name: characterBtnRegex }));
-      const notificationRegex = new RegExp(`${succeeded ? 'Yes' : 'No'},? .*${name}`, 'i');
-      expect(await screen.findByText(notificationRegex)).toBeVisible();
+      if (succeeded) {
+        expect(await screen.findByText(new RegExp(`Yes,? .*${name}`, 'i'))).toBeVisible();
+        expect(soundsMock.win).toHaveBeenCalledOnce();
+      } else {
+        expect(await screen.findByText(new RegExp(`No,? .*${name}`, 'i'))).toBeVisible();
+        expect(soundsMock.lose).toHaveBeenCalledOnce();
+      }
     }
+  });
+
+  it('should play the corresponding sound when the game is over', async () => {
+    const getFoundCharacters = signal<string[]>([]);
+    characterSelection.getFoundCharacters.mockImplementation(() => getFoundCharacters());
+    const user = userEvent.setup();
+    await renderComponent();
+    await user.click(screen.getByRole('button', { name: /start/i }));
+    const charactersData = characters.data;
+    for (const { name } of charactersData) {
+      characterSelection.evaluate.mockImplementationOnce(() => {
+        getFoundCharacters.set([...getFoundCharacters(), name]);
+        return of({ evaluation: { [name]: true }, finder });
+      });
+      user.click(await screen.findByRole('img', { name: /crowd.* waldo/i }));
+      user.click(await screen.findByRole('button', { name: new RegExp(`select.* ${name}`, 'i') }));
+      expect(await screen.findByText(new RegExp(`Yes,? .*${name}`, 'i'))).toBeVisible();
+    }
+    expect(soundsMock.win).toHaveBeenCalledTimes(charactersData.length - 1);
+    expect(soundsMock.end).toHaveBeenCalledOnce();
   });
 
   it('should prevent any further character selections when the game is over', async () => {
@@ -248,7 +286,9 @@ describe('Game', () => {
     for (const { name } of characters.data) {
       await user.click(await screen.findByRole('img', { name: /crowd.* waldo/i }));
       const characterBtnRegex = new RegExp(`select.* ${name}`, 'i');
-      expect(() => screen.findByRole('button', { name: characterBtnRegex })).rejects.toThrowError();
+      await expect(() =>
+        screen.findByRole('button', { name: characterBtnRegex })
+      ).rejects.toThrowError();
     }
   });
 
@@ -260,7 +300,7 @@ describe('Game', () => {
     await renderComponent();
     await user.click(screen.getByRole('button', { name: /start/i }));
     await user.click(await screen.findByRole('button', { name: /escape/i }));
-    expect(() => screen.findByRole('button', { name: /start/i })).rejects.toThrowError();
+    await expect(() => screen.findByRole('button', { name: /start/i })).rejects.toThrowError();
     expect(screen.getByRole('img', { name: /crowd.* waldo/i })).toBeVisible();
     expect(screen.getByRole('button', { name: /escape/i })).toBeDisabled();
     expect(screen.getByRole('button', { name: /escape/i })).toBeVisible();
