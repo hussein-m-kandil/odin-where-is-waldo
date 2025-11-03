@@ -3,6 +3,7 @@
   "name": "odin-where-is-waldo",
   "version": "0.0.0",
   "scripts": {
+    "build:zip": "npm run build && cd ./dist/browser/ && zip -r ../$npm_package_name.zip .",
     "watch": "ng build --watch --configuration development",
     "type-check": "tsc --noEmit -p ./tsconfig.spec.json",
     "lint": "ng lint --silent",
