@@ -20,6 +20,8 @@ import { Game } from './game';
 const characters = new Characters();
 
 const soundsMock = {
+  enabled: true,
+  toggle: vi.fn(),
   escape: vi.fn(),
   start: vi.fn(),
   lose: vi.fn(),
@@ -93,6 +95,20 @@ describe('Game', () => {
       }
     }
     characterSelection.getFoundCharacters.mockReset();
+  });
+
+  it('should render a button that toggles the game sounds', async () => {
+    soundsMock.toggle.mockImplementation(() => (soundsMock.enabled = !soundsMock.enabled));
+    const user = userEvent.setup();
+    await renderComponent();
+    for (let i = 0; i < 3; i++) {
+      const soundsToggler = screen.getByRole('checkbox', { name: /sounds/i });
+      await user.click(soundsToggler);
+      expect(soundsToggler).toBeVisible();
+      expect(soundsMock.toggle).toHaveBeenCalledTimes(i + 1);
+      if (i % 2 === 0) expect(soundsToggler).not.toBeChecked();
+      else expect(soundsToggler).toBeChecked();
+    }
   });
 
   it('should render the start button', async () => {

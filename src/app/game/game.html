@@ -19,22 +19,40 @@
   <div class="border-1 border-black">
     @let _notification = notifier.notification;
     <div
-      class="p-2 space-y-1 bg-black text-white font-bold"
+      class="p-2 bg-black text-white font-bold"
       [class]="{
         'bg-red-700': _notification.type === 'error',
         'bg-green-700': _notification.type === 'success'
       }"
     >
       <p>{{ _notification.message || 'Please help us find Waldo and his friends.' }}</p>
-      <button
-        type="button"
-        (click)="_finder ? escape() : start()"
-        [disabled]="_loading || _notification.type !== 'normal' || (_finder && gameOver())"
-        [class]="`text-sm py-1 px-2 min-w-24 shadow-sm border-1 rounded-lg cursor-pointer
-          disabled:text-gray-300 disabled:border-gray-300 active:not-disabled:bg-gray-500`"
+      <div
+        [class]="`*:inline-block *:m-1 *:text-sm *:py-1 *:px-2 *:min-w-24 *:shadow-sm *:border-2
+          *:rounded-lg  *:cursor-pointer *:active:not-disabled:bg-gray-500`"
       >
-        @if(_finder){Escape}@else{Start@if(_loading){ing...}}
-      </button>
+        <button
+          type="button"
+          (click)="_finder ? escape() : start()"
+          class="disabled:text-gray-300 disabled:border-gray-300"
+          [disabled]="_loading || _notification.type !== 'normal' || (_finder && gameOver())"
+        >
+          @if(_finder){Escape}@else{Start@if(_loading){ing...}}
+        </button>
+        <label
+          for="sounds-toggler"
+          [class]="`*:align-middle
+            ${sounds.enabled ? '' : 'line-through text-gray-300 border-gray-300'}`"
+        >
+          <span> Sounds </span>
+          <input
+            type="checkbox"
+            id="sounds-toggler"
+            [checked]="sounds.enabled"
+            (change)="sounds.toggle()"
+            class="appearance-none hidden"
+          />
+        </label>
+      </div>
     </div>
     @if (_finder) {
     <app-stats
