@@ -40,18 +40,18 @@ export class CharacterSelection {
     this._validSelections.set({});
   }
 
-  select(imageElement: HTMLImageElement, absolutePoint: Point) {
+  select(imageElement: HTMLImageElement, relativePoint: Point) {
     const scaleFactor = imageElement.naturalWidth / imageElement.clientWidth;
-    const imgRect = imageElement.getBoundingClientRect();
-    const relative = {
-      x: Math.trunc(absolutePoint.x - imgRect.left),
-      y: Math.trunc(absolutePoint.y - imgRect.top),
-    };
+    // const imgRect = imageElement.getBoundingClientRect();
+    // const relative = {
+    //   x: Math.trunc(absolutePoint.x - imgRect.left),
+    //   y: Math.trunc(absolutePoint.y - imgRect.top),
+    // };
     const natural = {
-      x: Math.trunc(relative.x * scaleFactor),
-      y: Math.trunc(relative.y * scaleFactor),
+      x: Math.trunc(relativePoint.x * scaleFactor),
+      y: Math.trunc(relativePoint.y * scaleFactor),
     };
-    this._setSelectionState(imageElement, { absolute: absolutePoint, relative, natural });
+    this._setSelectionState(imageElement, { relative: relativePoint, natural });
   }
 
   deselect() {

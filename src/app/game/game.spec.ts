@@ -44,7 +44,7 @@ class CharacterSelectionMock {
   });
   evaluate = vi.fn(() => of<EvaluationResult>({ evaluation: { waldo: true }, finder }));
   select = vi.fn((imageElement: HTMLImageElement, point: Point) => {
-    this._selectedPoint.set({ absolute: point, relative: point, natural: point });
+    this._selectedPoint.set({ relative: point, natural: point });
     this._imageElement = imageElement;
   });
   deselect = vi.fn(() => {

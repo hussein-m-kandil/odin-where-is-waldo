@@ -25,7 +25,7 @@ const markerSize = 16;
 const characterSelectedHandlerMock = vi.fn();
 
 const renderComponent = async () => {
-  const selectedPoint = { absolute: mockPoint(), relative: mockPoint(), natural: mockPoint() };
+  const selectedPoint = { relative: mockPoint(), natural: mockPoint() };
   const imageElement = mockImage();
   return await render(CharacterMenu, {
     providers: appConfig.providers,
@@ -60,10 +60,10 @@ describe('CharacterMenu', () => {
       await renderComponent();
       const menuElement = screen.getByLabelText(menuRegex);
       const markerElement = screen.getByLabelText(markerRegex);
-      expect(markerElement.style.left).toBe(`${rect.left}px`);
-      expect(markerElement.style.top).toBe(`${rect.top}px`);
+      expect(markerElement.style.left).toBe(`0px`);
+      expect(markerElement.style.top).toBe(`0px`);
       expect(menuElement.style.left).toBe(`0px`);
-      expect(menuElement.style.top).toBe(`${rect.y + markerSize + spacing}px`);
+      expect(menuElement.style.top).toBe(`${markerSize + spacing}px`);
     });
 
     it('should be rendered in the top-center corner', async () => {
@@ -72,9 +72,9 @@ describe('CharacterMenu', () => {
       await renderComponent();
       const menuElement = screen.getByLabelText(menuRegex);
       const markerElement = screen.getByLabelText(markerRegex);
-      expect(markerElement.style.top).toBe(`${rect.top}px`);
+      expect(markerElement.style.top).toBe(`0px`);
       expect(markerElement.style.left).toBe(`${point.x - markerSize * 0.5}px`);
-      expect(menuElement.style.top).toBe(`${rect.top + markerSize + spacing}px`);
+      expect(menuElement.style.top).toBe(`${markerSize + spacing}px`);
       expect(menuElement.style.left).toBe(`${point.x - menuSize * 0.5}px`);
     });
 
@@ -84,10 +84,10 @@ describe('CharacterMenu', () => {
       await renderComponent();
       const menuElement = screen.getByLabelText(menuRegex);
       const markerElement = screen.getByLabelText(markerRegex);
-      expect(markerElement.style.top).toBe(`${rect.top}px`);
-      expect(markerElement.style.left).toBe(`${rect.right - markerSize}px`);
-      expect(menuElement.style.top).toBe(`${rect.top + markerSize + spacing}px`);
-      expect(menuElement.style.left).toBe(`${point.x - menuSize}px`);
+      expect(markerElement.style.top).toBe(`0px`);
+      expect(markerElement.style.left).toBe(`${rect.width - markerSize}px`);
+      expect(menuElement.style.top).toBe(`${markerSize + spacing}px`);
+      expect(menuElement.style.left).toBe(`${rect.width - menuSize}px`);
     });
 
     it('should be rendered in the top-left quadrant', async () => {
@@ -108,10 +108,10 @@ describe('CharacterMenu', () => {
       await renderComponent();
       const menuElement = screen.getByLabelText(menuRegex);
       const markerElement = screen.getByLabelText(markerRegex);
+      expect(menuElement.style.left).toBe(`${point.x - menuSize * 0.5}px`);
+      expect(menuElement.style.top).toBe(`${point.y - (menuSize + markerSize * 0.5 + spacing)}px`);
       expect(markerElement.style.top).toBe(`${point.y - markerSize * 0.5}px`);
       expect(markerElement.style.left).toBe(`${point.x - markerSize * 0.5}px`);
-      expect(menuElement.style.top).toBe(`${point.y + markerSize * 0.5 + spacing}px`);
-      expect(menuElement.style.left).toBe(`${point.x - menuSize * 0.5}px`);
     });
 
     it('should be rendered in the top-right quadrant', async () => {
@@ -134,9 +134,9 @@ describe('CharacterMenu', () => {
       await renderComponent();
       const menuElement = screen.getByLabelText(menuRegex);
       const markerElement = screen.getByLabelText(markerRegex);
-      expect(markerElement.style.left).toBe(`${rect.left}px`);
-      expect(markerElement.style.top).toBe(`${rect.bottom - markerSize}px`);
-      expect(menuElement.style.top).toBe(`${rect.bottom - markerSize - spacing - menuSize}px`);
+      expect(markerElement.style.left).toBe(`0px`);
+      expect(markerElement.style.top).toBe(`${rect.height - markerSize}px`);
+      expect(menuElement.style.top).toBe(`${rect.height - markerSize - spacing - menuSize}px`);
       expect(menuElement.style.left).toBe(`0px`);
     });
 
@@ -146,9 +146,9 @@ describe('CharacterMenu', () => {
       await renderComponent();
       const menuElement = screen.getByLabelText(menuRegex);
       const markerElement = screen.getByLabelText(markerRegex);
-      expect(markerElement.style.top).toBe(`${rect.bottom - markerSize}px`);
+      expect(markerElement.style.top).toBe(`${rect.height - markerSize}px`);
       expect(markerElement.style.left).toBe(`${point.x - markerSize * 0.5}px`);
-      expect(menuElement.style.top).toBe(`${rect.bottom - markerSize - spacing - menuSize}px`);
+      expect(menuElement.style.top).toBe(`${rect.height - markerSize - spacing - menuSize}px`);
       expect(menuElement.style.left).toBe(`${point.x - menuSize * 0.5}px`);
     });
 
@@ -158,9 +158,9 @@ describe('CharacterMenu', () => {
       await renderComponent();
       const menuElement = screen.getByLabelText(menuRegex);
       const markerElement = screen.getByLabelText(markerRegex);
-      expect(markerElement.style.top).toBe(`${rect.bottom - markerSize}px`);
+      expect(markerElement.style.top).toBe(`${rect.height - markerSize}px`);
       expect(markerElement.style.left).toBe(`${point.x - markerSize * 0.5}px`);
-      expect(menuElement.style.top).toBe(`${rect.bottom - markerSize - spacing - menuSize}px`);
+      expect(menuElement.style.top).toBe(`${rect.height - markerSize - spacing - menuSize}px`);
       expect(menuElement.style.left).toBe(`${point.x - menuSize * 0.5}px`);
     });
 
@@ -170,9 +170,9 @@ describe('CharacterMenu', () => {
       await renderComponent();
       const menuElement = screen.getByLabelText(menuRegex);
       const markerElement = screen.getByLabelText(markerRegex);
-      expect(markerElement.style.top).toBe(`${rect.bottom - markerSize}px`);
+      expect(markerElement.style.top).toBe(`${rect.height - markerSize}px`);
       expect(markerElement.style.left).toBe(`${point.x - markerSize * 0.5}px`);
-      expect(menuElement.style.top).toBe(`${rect.bottom - markerSize - spacing - menuSize}px`);
+      expect(menuElement.style.top).toBe(`${rect.height - markerSize - spacing - menuSize}px`);
       expect(menuElement.style.left).toBe(`${point.x - menuSize * 0.5}px`);
     });
 
@@ -182,10 +182,10 @@ describe('CharacterMenu', () => {
       await renderComponent();
       const menuElement = screen.getByLabelText(menuRegex);
       const markerElement = screen.getByLabelText(markerRegex);
-      expect(markerElement.style.top).toBe(`${rect.bottom - markerSize}px`);
-      expect(markerElement.style.left).toBe(`${rect.right - markerSize}px`);
-      expect(menuElement.style.top).toBe(`${rect.bottom - markerSize - spacing - menuSize}px`);
-      expect(menuElement.style.left).toBe(`${point.x - menuSize}px`);
+      expect(markerElement.style.top).toBe(`${rect.height - markerSize}px`);
+      expect(markerElement.style.left).toBe(`${rect.width - markerSize}px`);
+      expect(menuElement.style.top).toBe(`${rect.height - markerSize - spacing - menuSize}px`);
+      expect(menuElement.style.left).toBe(`${rect.width - menuSize}px`);
     });
   });
 

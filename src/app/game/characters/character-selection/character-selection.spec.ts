@@ -30,7 +30,7 @@ describe('CharacterSelection', () => {
     const point = { x: 0, y: 0 };
     service.select(new Image(), point);
     expect(service.selectedPoint).toBeTruthy();
-    expect(service.selectedPoint).toHaveProperty('absolute', point);
+    expect(service.selectedPoint).toHaveProperty('relative', point);
   });
 
   it('should not have selection after calling `deselect`', () => {
@@ -91,7 +91,7 @@ describe('CharacterSelection', () => {
       .flush(evalRes);
     httpTesting.verify();
     expect(service.getFoundCharacters()).toStrictEqual([characterName]);
-    expect(service.selectedPoint).toHaveProperty('absolute', point);
+    expect(service.selectedPoint).toHaveProperty('relative', point);
     expect(service.imageElement).toBeInstanceOf(HTMLImageElement);
     service.reset();
     expect(service.imageElement).toBeNull();

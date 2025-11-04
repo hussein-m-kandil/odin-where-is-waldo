@@ -17,9 +17,11 @@ export class CharacterMenu {
   readonly menuSize = input(100);
   readonly spacing = input(8);
 
+  private readonly _imageRect = computed(() => this.imageElement().getBoundingClientRect());
+
   readonly selectedPoint = input.required<SelectedPoint>();
   protected readonly computedPlacementStyle = computed(() => {
-    const markerPlacement = this.calcSelectorMarkerPlacement(this.selectedPoint().absolute);
+    const markerPlacement = this.calcSelectorMarkerPlacement(this.selectedPoint().relative);
     const menuPlacement = this.calcSelectorMenuPlacement(markerPlacement);
     return {
       marker: this.generatePlacementStyle(markerPlacement),
@@ -38,13 +40,13 @@ export class CharacterMenu {
   }
 
   protected calcSelectorMarkerPlacement(point: Point): Placement {
-    const imageRect = this.imageElement().getBoundingClientRect();
+    const imageRect = this._imageRect();
     const markerSize = this.markerSize();
     const markerHalfSize = markerSize / 2;
-    const minTop = imageRect.top;
-    const minLeft = imageRect.left;
-    const maxTop = imageRect.bottom - markerSize;
-    const maxLeft = imageRect.right - markerSize;
+    const maxTop = imageRect.height - markerSize;
+    const maxLeft = imageRect.width - markerSize;
+    const minLeft = 0;
+    const minTop = 0;
     return {
       left: Math.min(Math.max(point.x - markerHalfSize, minLeft), maxLeft),
       top: Math.min(Math.max(point.y - markerHalfSize, minTop), maxTop),
@@ -57,19 +59,18 @@ export class CharacterMenu {
     const spacing = this.spacing();
     const menuSize = this.menuSize();
     const menuHalfSize = menuSize / 2;
-    const vpWidth = window.innerWidth;
-    const vpHeight = window.innerHeight;
+    const imageRect = this._imageRect();
     const markerTop = markerPlacement.top;
     const markerBottom = markerTop + markerPlacement.height;
     const markerCenterX = markerPlacement.width / 2 + markerPlacement.left;
     const markerCenterY = markerPlacement.height / 2 + markerPlacement.top;
-    const maxTop = Math.min(markerBottom + spacing, vpHeight - menuSize);
+    const maxTop = Math.min(markerBottom + spacing, imageRect.height - menuSize);
     const minTop = Math.max(markerTop - (menuSize + spacing), 0);
-    const maxLeft = vpWidth - menuSize;
+    const maxLeft = imageRect.width - menuSize;
     const minLeft = 0;
     return {
       left: Math.min(Math.max(markerCenterX - menuHalfSize, minLeft), maxLeft),
-      top: markerCenterY <= vpHeight / 2 ? maxTop : minTop,
+      top: markerCenterY <= imageRect.height / 2 ? maxTop : minTop,
       height: menuSize,
       width: menuSize,
     };

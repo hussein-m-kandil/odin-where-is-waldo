@@ -115,7 +115,7 @@ export class Game implements OnDestroy {
         // Stop propagation to prevent removing the selection under any circumstances,
         // e.g., in case of selecting by pressing Enter key while focusing the target (button)
         e.stopPropagation();
-        const point = { x: Math.trunc(e.clientX), y: Math.trunc(e.clientY) };
+        const point = { x: Math.trunc(e.offsetX), y: Math.trunc(e.offsetY) };
         this.characterSelection.select(imageElement, point);
       }
     }

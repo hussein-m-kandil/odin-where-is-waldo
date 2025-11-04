@@ -8,7 +8,6 @@ export interface Point {
 
 export interface SelectedPoint {
   relative: Point;
-  absolute: Point;
   natural: Point;
 }
 

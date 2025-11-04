@@ -59,46 +59,43 @@
       class="border-t-1"
       [foundCharacters]="characterSelection.getFoundCharacters().length"
     />
-    <div>
-      <div class="relative overflow-hidden">
-        <div class="pt-[63.3984%]">
-          <!-- Fill the parent's height relative to its width (old school `aspect-ratio`) -->
-        </div>
-        <button
-          type="button"
-          [class]="{ 'saturate-25': _loading }"
-          [class]="`focus-visible:outline-none focus-visible:inset-ring-2 inset-ring-black/20
-          absolute top-0 left-0 right-0 bottom-0`"
-          (click)="!_loading && selectCharacter($event)"
-        >
-          <img
-            fill
-            #crowd
-            priority
-            ngSrc="/where-is-waldo-winter.jpg"
-            alt="An illustration of a crowd of people skiing on an icy mountain, where you can find Waldo and his friends."
-            class="absolute top-0 left-0 right-0 bottom-0 -z-10"
-          />
-        </button>
-        @if (_loading) {
-        <span class="absolute top-0 left-0 right-0 bottom-0 bg-white/75 animate-pulse"></span>
-        }
-        <!-- prettier-ignore -->
-        @if (gameOver()) {
-        <div
-          class="{{`absolute top-0 left-0 right-0 bottom-0 z-10
-          bg-black/75 backdrop-saturate-25 backdrop-blur-xs`}}"
-        >
-          <app-finder-form
-            [finder]="_finder"
-            (submitted)="reset()"
-            class="{{`absolute top-1/2 left-1/2 -translate-1/2 w-full max-w-2xs
-              bg-white py-6 px-4 rounded-2xl`}}"
-          />
-        </div>
-        }
+    <div class="relative overflow-hidden">
+      <div class="pt-[63.3984%]">
+        <!-- Fill the parent's height relative to its width (old school `aspect-ratio`) -->
       </div>
-      @if (characterSelection.selectedPoint && characterSelection.imageElement) {
+      <button
+        type="button"
+        [class]="{ 'saturate-25': _loading }"
+        [class]="`focus-visible:outline-none focus-visible:inset-ring-2 inset-ring-black/20
+          absolute top-0 left-0 right-0 bottom-0`"
+        (click)="!_loading && selectCharacter($event)"
+      >
+        <img
+          fill
+          #crowd
+          priority
+          ngSrc="/where-is-waldo-winter.jpg"
+          alt="An illustration of a crowd of people skiing on an icy mountain, where you can find Waldo and his friends."
+          class="absolute top-0 left-0 right-0 bottom-0 -z-10"
+        />
+      </button>
+      @if (_loading) {
+      <span class="absolute top-0 left-0 right-0 bottom-0 bg-white/75 animate-pulse"></span>
+      }
+      <!-- prettier-ignore -->
+      @if (gameOver()) {
+      <div
+        class="{{`absolute top-0 left-0 right-0 bottom-0 z-10
+          bg-black/75 backdrop-saturate-25 backdrop-blur-xs`}}"
+      >
+        <app-finder-form
+          [finder]="_finder"
+          (submitted)="reset()"
+          class="{{`absolute top-1/2 left-1/2 -translate-1/2 w-full max-w-2xs
+              bg-white py-6 px-4 rounded-2xl`}}"
+        />
+      </div>
+      } @if (characterSelection.selectedPoint && characterSelection.imageElement) {
       <app-character-menu
         [imageElement]="characterSelection.imageElement"
         [selectedPoint]="characterSelection.selectedPoint"
