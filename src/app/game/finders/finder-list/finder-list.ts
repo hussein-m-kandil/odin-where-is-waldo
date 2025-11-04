@@ -1,11 +1,12 @@
 import { input, signal, inject, Component, afterNextRender } from '@angular/core';
+import { finalize, Observable, timer } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 import { Finder } from '../finders.types';
 import { Finders } from '../finders';
-import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-finder-list',
-  imports: [],
+  imports: [AsyncPipe],
   templateUrl: './finder-list.html',
   styles: ``,
 })
@@ -16,7 +17,7 @@ export class FinderList {
   readonly style = input<string | Record<string, unknown>>('');
 
   protected readonly finders = signal<Finder[]>([]);
-  protected readonly loading = signal(false);
+  protected readonly loading = signal<Observable<number> | null>(null);
   protected readonly error = signal(false);
 
   constructor() {
@@ -24,11 +25,11 @@ export class FinderList {
   }
 
   protected loadFinders() {
-    this.loading.set(true);
+    this.loading.set(timer(0, 500));
     this.error.set(false);
     this._finders
       .getAllFinders()
-      .pipe(finalize(() => this.loading.set(false)))
+      .pipe(finalize(() => this.loading.set(null)))
       .subscribe({
         next: (finders) => this.finders.set(finders),
         error: () => this.error.set(true),

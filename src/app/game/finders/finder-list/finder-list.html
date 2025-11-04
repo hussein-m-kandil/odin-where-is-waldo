@@ -1,8 +1,16 @@
 @let finderList = finders(); @let titleId = 'finder-list-title';
 <div class="text-center" [class]="class()" [style]="style()">
   <h2 id="{{ titleId }}" class="py-2 text-2xl font-bold">Finders</h2>
-  @if (loading()) {
-  <div class="pb-2">Loading finders...</div>
+  @if (loading(); as loader) {
+  <!-- prettier-ignore -->
+  @let ellipsis = ["after:content-['']", "after:content-['.']", "after:content-['..']"];
+  <p class="pb-2">
+    <span
+      [class]="`inline-block w-[7rem] text-left whitespace-nowrap
+        ${ellipsis[((loader | async) || 0) % 3]}`"
+      >Loading finders.</span
+    >
+  </p>
   } @else if (error()) {
   <div class="pb-2">
     <p class="text-red-700 text-sm">Couldn't be loaded.</p>
