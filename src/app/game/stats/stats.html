@@ -1,8 +1,8 @@
-@let time = (timer$ | async) ?? 0;
+@let seconds = elapsedSeconds();
 <div class="p-2 space-x-4 flex justify-between" [class]="class()" [style]="style()">
   <span role="timer" aria-atomic="true">
     Elapsed seconds:
-    <span class="font-bold">{{ time < 10000 ? time : time.toExponential(0) }}</span>
+    <span class="font-bold">{{ seconds < 10000 ? seconds : seconds.toExponential(0) }}</span>
   </span>
   <span>
     Found characters:

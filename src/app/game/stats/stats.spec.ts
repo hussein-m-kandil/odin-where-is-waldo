@@ -1,6 +1,6 @@
 import { render, RenderComponentOptions, screen } from '@testing-library/angular';
 import { provideZonelessChangeDetection } from '@angular/core';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { Stats } from './stats';
 
@@ -12,40 +12,19 @@ const renderComponent = async (options: RenderComponentOptions<Stats> = {}) => {
   });
 };
 
-const assertTimerValue = (v: number) => {
-  expect(screen.getByRole('timer')).toHaveTextContent(new RegExp(`Elapsed seconds: ${v}`, 'i'));
-};
-
 describe('Stats', () => {
-  it('should have a timer with a value of 0 at start', async () => {
-    vi.useFakeTimers();
+  it('should have 0 elapsed seconds, and 0 found characters by default', async () => {
     await renderComponent();
-    assertTimerValue(0);
-    vi.useRealTimers();
-  });
-
-  it('should have a timer increments by 1 every second', async () => {
-    vi.useFakeTimers();
-    await renderComponent();
-    for (let i = 0; i < 7; i++) {
-      assertTimerValue(i);
-      await vi.advanceTimersByTimeAsync(900);
-      assertTimerValue(i);
-      await vi.advanceTimersByTimeAsync(105);
-      assertTimerValue(i + 1);
-    }
-    vi.useRealTimers();
-  });
-
-  it('should have 0 found characters by default', async () => {
-    await renderComponent();
+    expect(screen.getByText(/elapsed seconds/i)).toHaveTextContent('Elapsed seconds: 0');
     expect(screen.getByText(/found characters/i)).toHaveTextContent('Found characters: 0');
   });
 
-  it('should have the give number of found characters', async () => {
-    const num = 3;
-    await renderComponent({ inputs: { foundCharacters: num } });
-    expect(screen.getByText(/found characters/i)).toHaveTextContent(`Found characters: ${num}`);
+  it('should have the give number of found seconds/characters', async () => {
+    const secNum = 17;
+    const charNum = 3;
+    await renderComponent({ inputs: { elapsedSeconds: secNum, foundCharacters: charNum } });
+    expect(screen.getByText(/elapsed seconds/i)).toHaveTextContent(`Elapsed seconds: ${secNum}`);
+    expect(screen.getByText(/found characters/i)).toHaveTextContent(`Found characters: ${charNum}`);
   });
 
   it('should have the given class', async () => {

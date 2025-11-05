@@ -57,6 +57,7 @@
     @if (_finder) {
     <app-stats
       class="border-t-1"
+      [elapsedSeconds]="timer.seconds + 1"
       [foundCharacters]="characterSelection.getFoundCharacters().length"
     />
     <div class="relative overflow-hidden">

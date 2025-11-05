@@ -19,6 +19,7 @@ import { Finder } from './finders/finders.types';
 import { Notifier } from './notifier/notifier';
 import { Finders } from './finders/finders';
 import { Sounds } from './sounds/sounds';
+import { Timer } from './timer/timer';
 import { Stats } from './stats/stats';
 import { finalize } from 'rxjs';
 
@@ -38,6 +39,7 @@ export class Game implements OnDestroy {
   protected readonly notifier = inject(Notifier);
   private readonly _finders = inject(Finders);
   protected readonly sounds = inject(Sounds);
+  protected readonly timer = inject(Timer);
 
   protected readonly finder = signal<Finder | null>(null);
   protected readonly loading = signal(false);
@@ -88,6 +90,7 @@ export class Game implements OnDestroy {
         .subscribe({
           next: (finder) => {
             this.finder.set(finder);
+            this.timer.start();
             this.sounds.start();
           },
           error: () => this.notifier.notify({ message: 'Failed to start!', type: 'error' }),
@@ -96,6 +99,7 @@ export class Game implements OnDestroy {
   }
 
   protected reset() {
+    this.timer.reset();
     this.finder.set(null);
     this.characterSelection.reset();
     this.notifier.notify(this.notifier.defaultNotification, 0);
@@ -103,6 +107,7 @@ export class Game implements OnDestroy {
 
   protected escape() {
     if (this.playable()) {
+      this.timer.stop();
       this.reset();
       this.sounds.escape();
     }
@@ -139,7 +144,12 @@ export class Game implements OnDestroy {
                   : `${name[0].toUpperCase()}${name.slice(1).toLowerCase()}`;
               if (evaluation[name]) {
                 this.notifier.notify({ message: `Yes, this is ${displayName}!`, type: 'success' });
-                this.sounds[this.gameOver() ? 'end' : 'win']();
+                if (this.gameOver()) {
+                  this.timer.stop();
+                  this.sounds.end();
+                } else {
+                  this.sounds.win();
+                }
               } else {
                 this.notifier.notify({
                   message: `No, this is not ${displayName}!`,
