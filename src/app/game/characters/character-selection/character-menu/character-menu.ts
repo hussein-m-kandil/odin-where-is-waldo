@@ -13,8 +13,8 @@ export class CharacterMenu {
   readonly characters = inject(Characters);
 
   readonly imageElement = input.required<HTMLImageElement>();
-  readonly markerSize = input(20);
-  readonly menuSize = input(100);
+  readonly markerSize = input(16);
+  readonly menuSize = input(96);
   readonly spacing = input(8);
 
   private readonly _imageRect = computed(() => this.imageElement().getBoundingClientRect());
