@@ -6,6 +6,8 @@ A web-based **"Where's Waldo"** game built as part of studying [The Odin Project
 
 > Have you ever played [Where’s Waldo](https://en.wikipedia.org/wiki/Where%27s_Wally%3F)? If not, here’s the idea: you are presented with a crowded illustration full of characters, objects, and details. Your task is to find a specific character named Waldo, hidden somewhere in the scene.
 
+![A screenshot of the Where's Waldo game.](./public/og-image-1200x630.jpg)
+
 This repository contains the **front-end application**, which communicates with the back-end API from the [Generic Express Service](https://github.com/hussein-m-kandil/generic-express-service).
 
 This is my **first Angular project**, and I intentionally avoided using external JavaScript or TypeScript libraries to focus on deepening my understanding of **Angular** and **RxJS**.
